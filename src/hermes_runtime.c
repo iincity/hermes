@@ -528,6 +528,16 @@ AST_T* runtime_visit_binop(runtime_T* runtime, AST_T* node)
 
                 return return_value;
             }
+            if (left->type == AST_STRING && right->type == AST_STRING)
+            {
+                char* new_str = calloc(strlen(left->string_value) + strlen(right->string_value) + 1, sizeof(char));
+                strcat(new_str, left->string_value);
+                strcat(new_str, right->string_value);
+                return_value = init_ast(AST_STRING);
+                return_value->string_value = new_str;
+
+                return return_value;
+            }
         } break;
         case TOKEN_MINUS: {
             if (left->type == AST_INTEGER && right->type == AST_INTEGER)
