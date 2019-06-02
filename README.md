@@ -97,3 +97,9 @@ list cool_stuff = [
     ]
 ];
 ```
+
+## Installing Hermes
+> To install Hermes on your system, simple run:
+```bash
+make && sudo make install
+```

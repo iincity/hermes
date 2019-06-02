@@ -18,6 +18,7 @@ install:
 	mkdir -p /usr/local/include/hermes
 	cp -r ./src/include/* /usr/local/include/hermes/.
 	cp ./libhermes.a /usr/local/lib/.
+	cp ./hermes.out /usr/local/bin/hermes
 
 clean:
 	-rm *.out
