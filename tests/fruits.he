@@ -1,14 +1,15 @@
-list fruits = [
-    "apple",
-    "banana",
-    "pear",
-    "lemon"
-];
-
-int i = 0;
-
-while (i < fruits.length)
+object createPerson(int age)
 {
-    print(fruits[i]);
-    i += 1;
+    object p = { int age; };
+    p.age = age;
+
+    return p;
+};
+
+
+int x = 0;
+while (x < 100)
+{
+    print(createPerson(x).age);
+    x += 1;
 }
