@@ -13,4 +13,6 @@ int main(int argc, char* argv[])
     AST_T* node = hermes_parser_parse(parser, (void*) 0);
     runtime_T* runtime = init_runtime();
     runtime_visit(runtime, node);
+
+    lexer_free(lexer);
 }
