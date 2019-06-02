@@ -24,8 +24,60 @@ while (i < fruits.length)
 > Here is a list of implemented data types:
 * list
 * int
-* boolean
+* bool
 * float
 * string
 * object
 * ref
+
+### List example
+```
+list colors = [
+    "red",
+    "green",
+    "blue"
+];
+```
+
+### Int example
+> Everyone knows what an integer is.
+```C
+int age = 22;
+```
+
+### Bool example
+> Everyone knows what an boolean is.
+```C
+bool x = 10 > 3;
+```
+
+### Float example
+> Everyone knows what an float is.
+```C
+float x = 0.5;
+```
+
+### String example
+> Everyone knows what a string is.
+```C
+string name = "John Doe";
+```
+
+### Object example
+> Objects are sort of what you think they are.
+```C
+object person = {
+    string name = "john";
+    int age = 22;
+};
+
+print(person.name);
+```
+
+### Ref example
+> Refs are supposed to be used when integrating hermes in some sort of environment and you want to keep track of "references" that the programmer can work with.
+```C
+ref something;
+
+something.x += 1;
+```
