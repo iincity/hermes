@@ -81,3 +81,19 @@ ref something;
 
 something.x += 1;
 ```
+
+## Notes
+### For loops
+> For loops does not exist, you can acheive the same thing with while loops and we are trying to keep the language simple.
+
+### Lists
+> This might not be obvious, but lists can contain any sort of value. Example:
+```C
+list cool_stuff = [
+    "this is a string",
+    { string x = "Wow, this is an object"; },
+    [
+        "a string in a list in a list"
+    ]
+];
+```
