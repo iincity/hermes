@@ -1,0 +1,13 @@
+list fruits = [
+    "apple",
+    "banana",
+    "pear"
+];
+
+int x = 0;
+
+while (x < fruits.length)
+{
+    print(fruits[x]);
+    x += 1;
+};
