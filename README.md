@@ -20,6 +20,20 @@ while (i < fruits.length)
 }
 ```
 
+## Linking a C program
+> Hermes can execute functions written in C.
+> To load a function written in C, you can use the `dload` method, to load
+> a function from a shared object file (`.so`). Example:
+```C
+dload("librequests.so", "httpget");
+
+string response = httpget("http://example.org")
+
+print(response)
+```
+> Here, the `httpget` function was loaded from the `librequests.so` file.
+> Read more about how to write C methods for Hermes [here](DLOAD.md).
+
 ## Available Data types
 > Here is a list of implemented data types:
 * list
