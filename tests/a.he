@@ -1,4 +1,5 @@
-string firstname = "john";
-string lastname = "doe";
+dload("/home/ianertson/workspace/testlib/libhermespi.so", "get_pi");
 
-print(firstname + " " + lastname);
+int x = get_pi();
+
+print(x);

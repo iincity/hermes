@@ -1,4 +1,5 @@
 #include "include/hermes_runtime.h"
+#include "include/dl.h"
 #include "include/token.h"
 #include <string.h>
 
@@ -212,7 +213,7 @@ AST_T* runtime_visit_function_definition(runtime_T* runtime, AST_T* node)
 }
 
 AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
-{
+{    
     hermes_scope_T* scope = get_scope(runtime, node);
 
     // TODO: remove this `if` and make a more beautiful implementation of
@@ -238,9 +239,30 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
         return init_ast(AST_NOOP);
     }
 
+    if (strcmp(node->function_call_name, "dload") == 0)
+    {
+        AST_T* ast_arg_0 = (AST_T*) node->function_call_arguments->items[0];
+        AST_T* visited_0 = runtime_visit(runtime, ast_arg_0);
+
+        AST_T* ast_arg_1 = (AST_T*) node->function_call_arguments->items[1];
+        AST_T* visited_1 = runtime_visit(runtime, ast_arg_1);
+
+        AST_T* fdef = get_dl_function(visited_0->string_value, visited_1->string_value);
+        fdef->scope = (struct hermes_scope_T*) scope;
+
+        runtime_visit(runtime, fdef);
+
+        return fdef;
+    } 
+
     for (int i = 0; i < scope->function_definitions->size; i++)
     {
         AST_T* function_definition = (AST_T*) scope->function_definitions->items[i];
+
+        if (function_definition->fptr)
+        {
+            return runtime_visit(runtime, (AST_T*) function_definition->fptr(node->function_call_arguments));
+        }
 
         hermes_scope_T* function_definition_body_scope = get_scope(runtime, function_definition->function_definition_body);
 
