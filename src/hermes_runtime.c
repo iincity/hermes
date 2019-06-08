@@ -57,6 +57,7 @@ AST_T* runtime_visit(runtime_T* runtime, AST_T* node)
         case AST_FUNCTION_DEFINITION: return runtime_visit_function_definition(runtime, node); break;
         case AST_FUNCTION_CALL: return runtime_visit_function_call(runtime, node); break;
         case AST_STRING: return runtime_visit_string(runtime, node); break;
+        case AST_CHAR: return runtime_visit_char(runtime, node); break;
         case AST_FLOAT: return runtime_visit_float(runtime, node); break;
         case AST_LIST: return runtime_visit_list(runtime, node); break;
         case AST_BOOLEAN: return runtime_visit_boolean(runtime, node); break;
@@ -228,6 +229,7 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
             switch (visited->type)
             {
                 case AST_STRING: printf("%s\n", visited->string_value); break;
+                case AST_CHAR: printf("%c\n", visited->char_value); break;
                 case AST_INTEGER: printf("%d\n", visited->int_value); break;
                 case AST_FLOAT: printf("%0.6f\n", visited->float_value); break;
                 case AST_BOOLEAN: printf("%d\n", visited->boolean_value); break;
@@ -296,6 +298,11 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
 }
 
 AST_T* runtime_visit_string(runtime_T* runtime, AST_T* node)
+{
+    return node;
+}
+
+AST_T* runtime_visit_char(runtime_T* runtime, AST_T* node)
 {
     return node;
 }

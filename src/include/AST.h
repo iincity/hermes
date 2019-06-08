@@ -15,6 +15,7 @@ typedef struct AST_STRUCT
         AST_FUNCTION_DEFINITION,
         AST_FUNCTION_CALL,
         AST_STRING,
+        AST_CHAR,
         AST_FLOAT,
         AST_LIST,
         AST_BOOLEAN,
@@ -37,6 +38,7 @@ typedef struct AST_STRUCT
     int int_value;
     unsigned int boolean_value;
     float float_value;
+    char char_value;
     char* string_value;
     char* type_value;
     char* variable_name;

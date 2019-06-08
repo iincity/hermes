@@ -5,6 +5,7 @@ typedef struct TOKEN_STRUCT
     enum
     {
         TOKEN_STRING_VALUE,
+        TOKEN_CHAR_VALUE,
         TOKEN_INTEGER_VALUE,
         TOKEN_FLOAT_VALUE,
         TOKEN_NUMBER_VALUE,

@@ -4,6 +4,7 @@
 
 const char* DATA_TYPE_VOID = "void";
 const char* DATA_TYPE_STRING = "string";
+const char* DATA_TYPE_CHAR = "char";
 const char* DATA_TYPE_INT = "int";
 const char* DATA_TYPE_FLOAT = "float";
 const char* DATA_TYPE_BOOLEAN = "bool";
@@ -74,6 +75,7 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
                 strcmp(token_value, DATA_TYPE_VOID) == 0 ||
                 strcmp(token_value, DATA_TYPE_INT) == 0 ||
                 strcmp(token_value, DATA_TYPE_STRING) == 0 ||
+                strcmp(token_value, DATA_TYPE_CHAR) == 0 ||
                 strcmp(token_value, DATA_TYPE_FLOAT) == 0 ||
                 strcmp(token_value, DATA_TYPE_BOOLEAN) == 0 ||
                 strcmp(token_value, DATA_TYPE_OBJECT) == 0 ||
@@ -121,7 +123,7 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
                 return a;
 
         } break;
-        case TOKEN_NUMBER_VALUE: case TOKEN_STRING_VALUE: case TOKEN_FLOAT_VALUE: case TOKEN_INTEGER_VALUE: return hermes_parser_parse_expr(hermes_parser, scope); break;
+        case TOKEN_NUMBER_VALUE: case TOKEN_STRING_VALUE: case TOKEN_CHAR_VALUE: case TOKEN_FLOAT_VALUE: case TOKEN_INTEGER_VALUE: return hermes_parser_parse_expr(hermes_parser, scope); break;
         default: return init_ast(AST_NOOP); break;
     }
 }
@@ -181,6 +183,17 @@ AST_T* hermes_parser_parse_string(hermes_parser_T* hermes_parser, hermes_scope_T
     ast_string->string_value = hermes_parser->current_token->value;
 
     hermes_parser_eat(hermes_parser, TOKEN_STRING_VALUE);
+
+    return ast_string;
+}
+
+AST_T* hermes_parser_parse_char(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
+{
+    AST_T* ast_string = init_ast(AST_CHAR);
+    ast_string->scope = (struct hermes_scope_T*) scope;
+    ast_string->char_value = hermes_parser->current_token->value[0];
+
+    hermes_parser_eat(hermes_parser, TOKEN_CHAR_VALUE);
 
     return ast_string;
 }
@@ -351,6 +364,7 @@ AST_T* hermes_parser_parse_factor(hermes_parser_T* hermes_parser, hermes_scope_T
         case TOKEN_INTEGER_VALUE: return hermes_parser_parse_integer(hermes_parser, scope); break;
         case TOKEN_FLOAT_VALUE: return hermes_parser_parse_float(hermes_parser, scope); break;
         case TOKEN_STRING_VALUE: return hermes_parser_parse_string(hermes_parser, scope); break;
+        case TOKEN_CHAR_VALUE: return hermes_parser_parse_char(hermes_parser, scope); break;
         case TOKEN_LBRACE: return hermes_parser_parse_object(hermes_parser, scope); break;
         case TOKEN_LBRACKET: return hermes_parser_parse_list(hermes_parser, scope); break;
         default: return hermes_parser_parse_expr(hermes_parser, scope); break;
@@ -365,6 +379,7 @@ AST_T* hermes_parser_parse_term(hermes_parser_T* hermes_parser, hermes_scope_T* 
         strcmp(token_value, DATA_TYPE_VOID) == 0 ||
         strcmp(token_value, DATA_TYPE_INT) == 0 ||
         strcmp(token_value, DATA_TYPE_STRING) == 0 ||
+        strcmp(token_value, DATA_TYPE_CHAR) == 0 ||
         strcmp(token_value, DATA_TYPE_FLOAT) == 0 ||
         strcmp(token_value, DATA_TYPE_BOOLEAN) == 0 ||
         strcmp(token_value, DATA_TYPE_OBJECT) == 0 ||

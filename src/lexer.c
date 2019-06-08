@@ -114,6 +114,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
         switch(lexer->current_char)
         {
             case '"': return lexer_collect_string(lexer); break;
+            case '\'': return lexer_collect_char(lexer); break;
             case '{': return lexer_advance_with_token(lexer, TOKEN_LBRACE); break;
             case '}': return lexer_advance_with_token(lexer, TOKEN_RBRACE); break;
             case '[': return lexer_advance_with_token(lexer, TOKEN_LBRACKET); break;
@@ -186,6 +187,38 @@ token_T* lexer_collect_string(lexer_T* lexer)
     lexer_advance(lexer);
 
     return init_token(TOKEN_STRING_VALUE, buffer);
+}
+
+token_T* lexer_collect_char(lexer_T* lexer)
+{
+    lexer_expect_char(lexer, '\'');
+    lexer_advance(lexer);
+    char* buffer = calloc(1, sizeof(char));
+    buffer[0] = '\0';
+
+    int c = 0;
+
+    while (lexer->current_char != '\'')
+    {
+        if (c > 1)
+        {
+            printf("Chars can only contain one character\n");
+            exit(1);
+        }
+
+        char* strchar = char_to_string(lexer->current_char);
+        buffer = realloc(buffer, strlen(buffer) + 2);
+        strcat(buffer, strchar);
+        free(strchar);
+
+        lexer_advance(lexer);
+
+        c++;
+    }
+
+    lexer_advance(lexer);
+
+    return init_token(TOKEN_CHAR_VALUE, buffer);
 }
 
 token_T* lexer_collect_number(lexer_T* lexer)
