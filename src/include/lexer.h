@@ -11,6 +11,7 @@ typedef struct LEXER_STRUCT
     char* contents;
     char current_char;
     unsigned int char_index;
+    unsigned int line_n;
 } lexer_T;
 
 lexer_T* init_lexer(char* contents);

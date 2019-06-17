@@ -29,6 +29,12 @@ hermes_parser_T* init_hermes_parser(lexer_T* lexer)
 
 // etc
 
+void hermes_parser_type_error(hermes_parser_T* hermes_parser)
+{
+    printf("[Line %d] Invalid type for assigned value\n", hermes_parser->lexer->line_n);
+    exit(1);
+}
+
 AST_T* hermes_parser_parse(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
 {
     return hermes_parser_parse_statements(hermes_parser, scope);
@@ -39,7 +45,8 @@ AST_T* hermes_parser_eat(hermes_parser_T* hermes_parser, int token_type)
     if (hermes_parser->current_token->type != token_type)
     {
         printf(
-            "Unexpected token `%s`, was expecting `%d`.\n",
+            "[Line %d] Unexpected token `%s`, was expecting `%d`.\n",
+            hermes_parser->lexer->line_n,
             hermes_parser->current_token->value,
             token_type
         );
@@ -584,6 +591,23 @@ AST_T* hermes_parser_parse_function_definition(hermes_parser_T* hermes_parser, h
         {
             hermes_parser_eat(hermes_parser, TOKEN_EQUALS);
             ast_variable_definition->variable_value = hermes_parser_parse_expr(hermes_parser, scope);
+
+            /**
+             * Performing all the kinds of type-checks we can possibly cover,
+             * this is only for reducing type-errors, we cannot possibly cover
+             * everything here since the value might be kind of unknown, but
+             * this is better than nothing.
+             */
+            switch(ast_variable_definition->variable_value->type)
+            {
+                case AST_OBJECT: if (strcmp(ast_type->type_value, DATA_TYPE_OBJECT) != 0) hermes_parser_type_error(hermes_parser); break;
+                case AST_STRING: if (strcmp(ast_type->type_value, DATA_TYPE_STRING) != 0) hermes_parser_type_error(hermes_parser); break;
+                case AST_INTEGER: if (strcmp(ast_type->type_value, DATA_TYPE_INT) != 0) hermes_parser_type_error(hermes_parser); break;
+                case AST_FLOAT: if (strcmp(ast_type->type_value, DATA_TYPE_FLOAT) != 0) hermes_parser_type_error(hermes_parser); break;
+                case AST_BOOLEAN: if (strcmp(ast_type->type_value, DATA_TYPE_BOOLEAN) != 0) hermes_parser_type_error(hermes_parser); break;
+                case AST_LIST: if (strcmp(ast_type->type_value, DATA_TYPE_LIST) != 0) hermes_parser_type_error(hermes_parser); break;
+                case AST_CHAR: if (strcmp(ast_type->type_value, DATA_TYPE_CHAR) != 0) hermes_parser_type_error(hermes_parser); break;
+            }
         }
 
         return ast_variable_definition;

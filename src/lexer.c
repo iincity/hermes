@@ -19,6 +19,7 @@ lexer_T* init_lexer(char* contents)
     lexer_T* lexer = calloc(1, sizeof(struct LEXER_STRUCT));
     lexer->contents = contents;
     lexer->char_index = 0;
+    lexer->line_n = 1;
     lexer->current_char = lexer->contents[lexer->char_index];
 
     return lexer;
@@ -129,7 +130,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             case '.': return lexer_advance_with_token(lexer, TOKEN_DOT); break;
             case '<': return lexer_advance_with_token(lexer, TOKEN_LESS_THAN); break;
             case '>': return lexer_advance_with_token(lexer, TOKEN_LARGER_THAN); break;
-            default: printf("unexpected %c\n", lexer->current_char); exit(1); break;
+            default: printf("[Line %d] Unexpected %c\n", lexer->line_n, lexer->current_char); exit(1); break;
         }
     }
 
@@ -145,6 +146,9 @@ token_T* lexer_advance_with_token(lexer_T* lexer, int type)
 
 void lexer_advance(lexer_T* lexer)
 {
+    if (lexer->current_char == '\n' || lexer->current_char == 10)
+        lexer->line_n += 1;
+
     if (lexer->current_char != '\0' && lexer->char_index < strlen(lexer->contents) - 1)
     {
         lexer->char_index += 1;
