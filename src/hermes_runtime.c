@@ -259,17 +259,17 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
 
     for (int i = 0; i < scope->function_definitions->size; i++)
     {
-        AST_T* function_definition = (AST_T*) scope->function_definitions->items[i];
-
-        if (function_definition->fptr)
-        {
-            return runtime_visit(runtime, (AST_T*) function_definition->fptr(node->function_call_arguments));
-        }
-
-        hermes_scope_T* function_definition_body_scope = get_scope(runtime, function_definition->function_definition_body);
+        AST_T* function_definition = (AST_T*) scope->function_definitions->items[i];  
 
         if (strcmp(function_definition->function_name, node->function_call_name) == 0)
         {
+            if (function_definition->fptr)
+            {
+                return runtime_visit(runtime, (AST_T*) function_definition->fptr(node->function_call_arguments));
+            }
+
+            hermes_scope_T* function_definition_body_scope = get_scope(runtime, function_definition->function_definition_body);
+
             for (int x = 0; x < node->function_call_arguments->size; x++)
             {
                 AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
