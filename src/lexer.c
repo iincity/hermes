@@ -1,11 +1,12 @@
 #include "include/lexer.h"
+#include "include/string_utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
 
 
-char* char_to_string(char c)
+char* hermes_char_to_string(char c)
 {
     char* str = calloc(2, sizeof(char));
     str[0] = c;
@@ -40,7 +41,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
 
         if (lexer->current_char == '+')
         {
-            char* value = char_to_string(lexer->current_char);
+            char* value = hermes_char_to_string(lexer->current_char);
 
             int type = TOKEN_PLUS;
             lexer_advance(lexer);
@@ -49,7 +50,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             {
                 type = TOKEN_PLUS_EQUALS;
                 value = realloc(value, strlen(value) + 2);
-                strcat(value, char_to_string(lexer->current_char));
+                strcat(value, hermes_char_to_string(lexer->current_char));
 
                 lexer_advance(lexer);
             }
@@ -59,7 +60,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
 
         if (lexer->current_char == '-')
         {
-            char* value = char_to_string(lexer->current_char);
+            char* value = hermes_char_to_string(lexer->current_char);
 
             int type = TOKEN_MINUS;
             lexer_advance(lexer);
@@ -68,7 +69,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             {
                 type = TOKEN_MINUS_EQUALS;
                 value = realloc(value, strlen(value) + 2);
-                strcat(value, char_to_string(lexer->current_char));
+                strcat(value, hermes_char_to_string(lexer->current_char));
 
                 lexer_advance(lexer);
             }
@@ -78,7 +79,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
 
         if (lexer->current_char == '*')
         {
-            char* value = char_to_string(lexer->current_char);
+            char* value = hermes_char_to_string(lexer->current_char);
 
             int type = TOKEN_STAR;
             lexer_advance(lexer);
@@ -87,7 +88,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             {
                 type = TOKEN_STAR_EQUALS;
                 value = realloc(value, strlen(value) + 2);
-                strcat(value, char_to_string(lexer->current_char));
+                strcat(value, hermes_char_to_string(lexer->current_char));
 
                 lexer_advance(lexer);
             }
@@ -97,14 +98,14 @@ token_T* lexer_get_next_token(lexer_T* lexer)
 
         if (lexer->current_char == '&')
         {
-            char* value = char_to_string(lexer->current_char);
+            char* value = hermes_char_to_string(lexer->current_char);
             
             lexer_advance(lexer);
 
             if (lexer->current_char == '&')
             {
                 value = realloc(value, strlen(value) + 2);
-                strcat(value, char_to_string(lexer->current_char));
+                strcat(value, hermes_char_to_string(lexer->current_char));
 
                 lexer_advance(lexer);
                 
@@ -139,7 +140,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
 
 token_T* lexer_advance_with_token(lexer_T* lexer, int type)
 {
-    char* value = char_to_string(lexer->current_char);
+    char* value = hermes_char_to_string(lexer->current_char);
     lexer_advance(lexer);
     return init_token(type, value);
 }
@@ -180,7 +181,7 @@ token_T* lexer_collect_string(lexer_T* lexer)
 
     while (lexer->current_char != '"')
     {
-        char* strchar = char_to_string(lexer->current_char);
+        char* strchar = hermes_char_to_string(lexer->current_char);
         buffer = realloc(buffer, strlen(buffer) + 2);
         strcat(buffer, strchar);
         free(strchar);
@@ -210,7 +211,7 @@ token_T* lexer_collect_char(lexer_T* lexer)
             exit(1);
         }
 
-        char* strchar = char_to_string(lexer->current_char);
+        char* strchar = hermes_char_to_string(lexer->current_char);
         buffer = realloc(buffer, strlen(buffer) + 2);
         strcat(buffer, strchar);
         free(strchar);
@@ -234,7 +235,7 @@ token_T* lexer_collect_number(lexer_T* lexer)
 
     while (isdigit(lexer->current_char))
     {
-        char* strchar = char_to_string(lexer->current_char);
+        char* strchar = hermes_char_to_string(lexer->current_char);
         buffer = realloc(buffer, strlen(buffer) + 2);
         strcat(buffer, strchar);
         free(strchar);
@@ -244,7 +245,7 @@ token_T* lexer_collect_number(lexer_T* lexer)
 
     if (lexer->current_char == '.')
     {
-        char* strchar = char_to_string(lexer->current_char);
+        char* strchar = hermes_char_to_string(lexer->current_char);
         buffer = realloc(buffer, strlen(buffer) + 2);
         strcat(buffer, strchar);
         free(strchar);
@@ -255,7 +256,7 @@ token_T* lexer_collect_number(lexer_T* lexer)
 
         while (isdigit(lexer->current_char))
         {
-            char* strchar = char_to_string(lexer->current_char);
+            char* strchar = hermes_char_to_string(lexer->current_char);
             buffer = realloc(buffer, strlen(buffer) + 2);
             strcat(buffer, strchar);
             free(strchar);
@@ -274,7 +275,7 @@ token_T* lexer_collect_id(lexer_T* lexer)
 
     while (isalnum(lexer->current_char) || lexer->current_char == '_')
     {
-        char* strchar = char_to_string(lexer->current_char);
+        char* strchar = hermes_char_to_string(lexer->current_char);
         buffer = realloc(buffer, strlen(buffer) + 2);
         strcat(buffer, strchar);
         free(strchar);
