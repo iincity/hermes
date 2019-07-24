@@ -68,7 +68,7 @@ typedef struct AST_STRUCT
     
     struct hermes_scope_T* scope;
 
-    struct AST_STRUCT_T* (*fptr)(dynamic_list_T* args);
+    struct AST_STRUCT* (*fptr)(dynamic_list_T* args);
 } AST_T;
 
 AST_T* init_ast(int type);
