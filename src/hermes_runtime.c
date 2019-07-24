@@ -109,6 +109,24 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
         }
     }
 
+    // we did not find anything in the local scope, lets continue looking
+    // in the global scope.
+
+    hermes_scope_T* global_scope = runtime->scope;
+
+    for (int i = 0; i < global_scope->variable_definitions->size; i++)
+    {
+        AST_T* variable_definition = (AST_T*) global_scope->variable_definitions->items[i];
+
+        if (strcmp(variable_definition->variable_name, node->variable_name) == 0)
+        {
+            if (!variable_definition->variable_value)
+                return variable_definition;
+
+            return runtime_visit(runtime, variable_definition->variable_value);
+        }
+    }
+
     printf("Undefined variable %s\n", node->variable_name); exit(1);
 }
 
@@ -265,7 +283,16 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
         {
             if (function_definition->fptr)
             {
-                return runtime_visit(runtime, (AST_T*) function_definition->fptr(node->function_call_arguments));
+                dynamic_list_T* visited_fptr_args = init_dynamic_list(sizeof(struct AST_STRUCT*));
+
+                for (int x = 0; x < node->function_call_arguments->size; x++)
+                {
+                    AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
+                    AST_T* visited = runtime_visit(runtime, ast_arg);
+                    dynamic_list_append(visited_fptr_args, visited);
+                }
+
+                return runtime_visit(runtime, (AST_T*) function_definition->fptr(visited_fptr_args));
             }
 
             hermes_scope_T* function_definition_body_scope = get_scope(runtime, function_definition->function_definition_body);
