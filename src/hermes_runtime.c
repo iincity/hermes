@@ -4,6 +4,16 @@
 #include <string.h>
 
 
+static void _reference_not_registered_error(char* reference_name)
+{
+    printf(
+        "The reference `%s` is not registered in the current runtime.\n",
+        reference_name
+    );
+
+    exit(1);
+}
+
 runtime_T* init_runtime()
 {
     runtime_T* runtime = calloc(1, sizeof(struct RUNTIME_STRUCT));
@@ -96,9 +106,20 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
 {
     hermes_scope_T* scope = get_scope(runtime, node);
 
+    runtime_reference_T* runtime_reference = runtime_get_reference(
+        runtime,
+        node->variable_name
+    );
+
+    if (runtime_reference == (void*) 0)
+        _reference_not_registered_error(node->variable_name);
+
     for (int i = 0; i < scope->variable_definitions->size; i++)
     {
         AST_T* variable_definition = (AST_T*) scope->variable_definitions->items[i];
+
+        if (strcmp(variable_definition->variable_type->type_value, "ref") == 0)
+            return runtime_visit(runtime, runtime_reference->object);
 
         if (strcmp(variable_definition->variable_name, node->variable_name) == 0)
         {
@@ -117,6 +138,9 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
     for (int i = 0; i < global_scope->variable_definitions->size; i++)
     {
         AST_T* variable_definition = (AST_T*) global_scope->variable_definitions->items[i];
+
+        if (strcmp(variable_definition->variable_type->type_value, "ref") == 0)
+            return runtime_visit(runtime, runtime_reference->object);
 
         if (strcmp(variable_definition->variable_name, node->variable_name) == 0)
         {
@@ -412,8 +436,7 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
 
             if (!reference)
             {
-                printf("The reference `%s` is not registered in the current runtime.\n", left->variable_name);
-                exit(1);
+                _reference_not_registered_error(left->variable_name);
             }
             else
             {
