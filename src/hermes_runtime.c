@@ -144,6 +144,9 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
     {
         AST_T* variable_definition = get_variable_definition_by_name(runtime, local_scope, node->variable_name);
 
+        if (variable_definition->type != AST_VARIABLE_DEFINITION)
+            return variable_definition;
+
         if (variable_definition)
         {
             return runtime_visit(runtime, variable_definition->variable_value);
@@ -153,6 +156,9 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
     if (global_scope)
     {
         AST_T* variable_definition = get_variable_definition_by_name(runtime, global_scope, node->variable_name);
+
+        if (variable_definition->type != AST_VARIABLE_DEFINITION)
+            return variable_definition;
 
         if (variable_definition)
         {
