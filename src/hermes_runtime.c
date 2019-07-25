@@ -184,6 +184,7 @@ AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
         node->variable_name
     );
 
+    /* ================== TODO: implement this again
     if (vardef_global != (void*) 0)
     {
         _multiple_variable_definitions_error(node->variable_name);
@@ -201,7 +202,7 @@ AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
         {
             _multiple_variable_definitions_error(node->variable_name);
         }
-    }
+    }*/
 
     if (node->variable_value)
     {
