@@ -36,6 +36,8 @@ AST_T* runtime_visit_function_definition(runtime_T* runtime, AST_T* node);
 
 AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node);
 
+AST_T* runtime_visit_null(runtime_T* runtime, AST_T* node);
+
 AST_T* runtime_visit_string(runtime_T* runtime, AST_T* node);
 
 AST_T* runtime_visit_char(runtime_T* runtime, AST_T* node);

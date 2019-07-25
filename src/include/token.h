@@ -18,6 +18,7 @@ typedef struct TOKEN_STRUCT
         TOKEN_LPAREN,
         TOKEN_RPAREN,
         TOKEN_EQUALS,
+        TOKEN_EQUALS_EQUALS,
         TOKEN_SEMI,
         TOKEN_COMMA,
         TOKEN_PLUS,

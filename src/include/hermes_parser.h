@@ -45,6 +45,8 @@ AST_T* hermes_parser_parse_array(hermes_parser_T* hermes_parser, hermes_scope_T*
 
 AST_T* hermes_parser_parse_boolean(hermes_parser_T* hermes_parser, hermes_scope_T* scope);
 
+AST_T* hermes_parser_parse_null(hermes_parser_T* hermes_parser, hermes_scope_T* scope);
+
 AST_T* hermes_parser_parse_variable(hermes_parser_T* hermes_parser, hermes_scope_T* scope);
 
 AST_T* hermes_parser_parse_object(hermes_parser_T* hermes_parser, hermes_scope_T* scope);

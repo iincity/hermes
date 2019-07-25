@@ -66,6 +66,7 @@ AST_T* runtime_visit(runtime_T* runtime, AST_T* node)
         case AST_VARIABLE_MODIFIER: return runtime_visit_variable_modifier(runtime, node); break;
         case AST_FUNCTION_DEFINITION: return runtime_visit_function_definition(runtime, node); break;
         case AST_FUNCTION_CALL: return runtime_visit_function_call(runtime, node); break;
+        case AST_NULL: return runtime_visit_null(runtime, node); break;
         case AST_STRING: return runtime_visit_string(runtime, node); break;
         case AST_CHAR: return runtime_visit_char(runtime, node); break;
         case AST_FLOAT: return runtime_visit_float(runtime, node); break;
@@ -172,7 +173,13 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
 AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
 {
     if (node->variable_value)
+    {
         node->variable_value = runtime_visit(runtime, node->variable_value);
+    }
+    else
+    {
+        node->variable_value = init_ast(AST_NULL);
+    }
 
     dynamic_list_append(get_scope(runtime, node)->variable_definitions, node);
 
@@ -285,6 +292,7 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
 
             switch (visited->type)
             {
+                case AST_NULL: printf("NULL\n"); break;
                 case AST_STRING: printf("%s\n", visited->string_value); break;
                 case AST_CHAR: printf("%c\n", visited->char_value); break;
                 case AST_INTEGER: printf("%d\n", visited->int_value); break;
@@ -361,6 +369,11 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
     }
 
     printf("Undefined method %s\n", node->function_call_name); exit(1);
+}
+
+AST_T* runtime_visit_null(runtime_T* runtime, AST_T* node)
+{
+    return node;
 }
 
 AST_T* runtime_visit_string(runtime_T* runtime, AST_T* node)
@@ -809,6 +822,71 @@ AST_T* runtime_visit_binop(runtime_T* runtime, AST_T* node)
             {
                 return_value = init_ast(AST_BOOLEAN);
                 return_value->boolean_value = left->float_value > right->int_value;
+
+                return return_value;
+            }
+        } break;
+        case TOKEN_EQUALS_EQUALS: {
+            if (left->type == AST_INTEGER && right->type == AST_INTEGER)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = left->int_value == right->int_value;
+
+                return return_value;
+            }
+            if (left->type == AST_INTEGER && right->type == AST_FLOAT)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = left->int_value == right->float_value;
+
+                return return_value;
+            }
+            if (left->type == AST_INTEGER && right->type == AST_NULL)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = left->int_value == 0;
+
+                return return_value;
+            }
+            if (left->type == AST_FLOAT && right->type == AST_FLOAT)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = left->float_value == right->float_value;
+
+                return return_value;
+            }
+            if (left->type == AST_FLOAT && right->type == AST_INTEGER)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = left->float_value == right->int_value;
+
+                return return_value;
+            }
+            if (left->type == AST_FLOAT && right->type == AST_NULL)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = left->float_value == 0;
+
+                return return_value;
+            }
+            if (left->type == AST_STRING && right->type == AST_NULL)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = left->string_value == (void*) 0;
+
+                return return_value;
+            }
+            if (left->type == AST_OBJECT && right->type == AST_NULL)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = left->object_children->size == 0;
+
+                return return_value;
+            }
+            if (left->type == AST_NULL && right->type == AST_NULL)
+            {
+                return_value = init_ast(AST_BOOLEAN);
+                return_value->boolean_value = 1;
 
                 return return_value;
             }

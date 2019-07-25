@@ -19,6 +19,7 @@ const char* STATEMENT_RETURN = "return";
 
 const char* VALUE_FALSE = "false";
 const char* VALUE_TRUE = "true";
+const char* VALUE_NULL = "NULL";
 
 hermes_parser_T* init_hermes_parser(lexer_T* lexer)
 {
@@ -74,6 +75,9 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
 
             if (strcmp(token_value, VALUE_FALSE) == 0 || strcmp(token_value, VALUE_TRUE) == 0)
                 return hermes_parser_parse_boolean(hermes_parser, scope);
+
+            if (strcmp(token_value, VALUE_NULL) == 0)
+                return hermes_parser_parse_null(hermes_parser, scope);
 
             if (strcmp(token_value, STATEMENT_RETURN) == 0)
                 return hermes_parser_parse_return(hermes_parser, scope);
@@ -237,6 +241,16 @@ AST_T* hermes_parser_parse_boolean(hermes_parser_T* hermes_parser, hermes_scope_
     return ast_boolean;
 }
 
+AST_T* hermes_parser_parse_null(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
+{
+    AST_T* ast_null = init_ast(AST_NULL);
+    ast_null->scope = (struct hermes_scope_T*) scope;
+
+    hermes_parser_eat(hermes_parser, TOKEN_ID);
+
+    return ast_null;
+}
+
 AST_T* hermes_parser_parse_variable(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
 {
     AST_T* ast_variable = init_ast(AST_VARIABLE);
@@ -328,6 +342,9 @@ AST_T* hermes_parser_parse_factor(hermes_parser_T* hermes_parser, hermes_scope_T
     if (strcmp(hermes_parser->current_token->value, VALUE_FALSE) == 0 || strcmp(hermes_parser->current_token->value, VALUE_TRUE) == 0)
         return hermes_parser_parse_boolean(hermes_parser, scope);
 
+    if (strcmp(hermes_parser->current_token->value, VALUE_NULL) == 0)
+        return hermes_parser_parse_null(hermes_parser, scope);
+
     if (hermes_parser->current_token->type == TOKEN_ID)
     {
         hermes_parser_eat(hermes_parser, TOKEN_ID);
@@ -403,7 +420,8 @@ AST_T* hermes_parser_parse_term(hermes_parser_T* hermes_parser, hermes_scope_T* 
         hermes_parser->current_token->type == TOKEN_STAR ||
         hermes_parser->current_token->type == TOKEN_AND ||
         hermes_parser->current_token->type == TOKEN_LESS_THAN ||
-        hermes_parser->current_token->type == TOKEN_LARGER_THAN
+        hermes_parser->current_token->type == TOKEN_LARGER_THAN ||
+        hermes_parser->current_token->type == TOKEN_EQUALS_EQUALS
     )
     {
         int binop_operator = hermes_parser->current_token->type;

@@ -14,6 +14,7 @@ typedef struct AST_STRUCT
         AST_VARIABLE_MODIFIER,
         AST_FUNCTION_DEFINITION,
         AST_FUNCTION_CALL,
+        AST_NULL,
         AST_STRING,
         AST_CHAR,
         AST_FLOAT,
