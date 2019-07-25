@@ -1,7 +1,8 @@
 exec = test.out
 sources = $(wildcard src/*.c)
 sources += $(wildcard ../src/*.c)
-objects = $(sources:.c=.o)
+sources_no_main := $(filter-out ../src/main.c, $(sources))
+objects = $(sources_no_main:.c=.o)
 flags = -g -I../../cmocka/include -ldl -lm -lcmocka
 
 

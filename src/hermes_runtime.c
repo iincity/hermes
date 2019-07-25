@@ -100,53 +100,62 @@ unsigned int _boolean_evaluation(AST_T* node)
     }
 }
 
-/* ==== end of helpers ==== */
-
-AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
+AST_T* get_variable_definition_by_name(runtime_T* runtime, hermes_scope_T* scope, char* variable_name)
 {
-    hermes_scope_T* scope = get_scope(runtime, node);
-
-    runtime_reference_T* runtime_reference = runtime_get_reference(
-        runtime,
-        node->variable_name
-    );
-
-    if (runtime_reference == (void*) 0)
-        _reference_not_registered_error(node->variable_name);
-
     for (int i = 0; i < scope->variable_definitions->size; i++)
     {
         AST_T* variable_definition = (AST_T*) scope->variable_definitions->items[i];
 
-        if (strcmp(variable_definition->variable_type->type_value, "ref") == 0)
-            return runtime_visit(runtime, runtime_reference->object);
-
-        if (strcmp(variable_definition->variable_name, node->variable_name) == 0)
+        if (strcmp(variable_definition->variable_name, variable_name) == 0)
         {
+            if (strcmp(variable_definition->variable_type->type_value, "ref") == 0)
+            {
+                runtime_reference_T* runtime_reference = runtime_get_reference(
+                    runtime,
+                    variable_name
+                );
+
+                if (runtime_reference == (void*) 0)
+                    _reference_not_registered_error(variable_name);
+
+                return runtime_visit(runtime, runtime_reference->object);
+            }
+ 
             if (!variable_definition->variable_value)
                 return variable_definition;
 
+            return variable_definition;
+        }
+    }
+
+    return (void*) 0;
+}
+
+/* ==== end of helpers ==== */
+
+AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
+{
+    hermes_scope_T* local_scope = (hermes_scope_T*) node->scope;
+    hermes_scope_T* global_scope = runtime->scope;
+
+    hermes_scope_T* scope = get_scope(runtime, node); 
+
+    if (local_scope)
+    {
+        AST_T* variable_definition = get_variable_definition_by_name(runtime, local_scope, node->variable_name);
+
+        if (variable_definition)
+        {
             return runtime_visit(runtime, variable_definition->variable_value);
         }
     }
 
-    // we did not find anything in the local scope, lets continue looking
-    // in the global scope.
-
-    hermes_scope_T* global_scope = runtime->scope;
-
-    for (int i = 0; i < global_scope->variable_definitions->size; i++)
+    if (global_scope)
     {
-        AST_T* variable_definition = (AST_T*) global_scope->variable_definitions->items[i];
+        AST_T* variable_definition = get_variable_definition_by_name(runtime, global_scope, node->variable_name);
 
-        if (strcmp(variable_definition->variable_type->type_value, "ref") == 0)
-            return runtime_visit(runtime, runtime_reference->object);
-
-        if (strcmp(variable_definition->variable_name, node->variable_name) == 0)
+        if (variable_definition)
         {
-            if (!variable_definition->variable_value)
-                return variable_definition;
-
             return runtime_visit(runtime, variable_definition->variable_value);
         }
     }

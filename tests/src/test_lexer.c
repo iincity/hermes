@@ -20,14 +20,14 @@ void test_lexer_behavior(void** state)
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_LBRACE);
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_ID);
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_EQUALS);
-    assert_true(lexer_get_next_token(lexer)->type == TOKEN_NUMBER_VALUE);
+    assert_true(lexer_get_next_token(lexer)->type == TOKEN_INTEGER_VALUE);
 
     assert_true(lexer->current_char == ';');
 
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_SEMI);
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_ID);
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_EQUALS);
-    assert_true(lexer_get_next_token(lexer)->type == TOKEN_NUMBER_VALUE);
+    assert_true(lexer_get_next_token(lexer)->type == TOKEN_INTEGER_VALUE);
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_SEMI);
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_ID);
     assert_true(lexer_get_next_token(lexer)->type == TOKEN_EQUALS);
