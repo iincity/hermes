@@ -134,6 +134,25 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             }
         }
 
+        if (lexer->current_char == '!')
+        {
+            char* value = hermes_char_to_string(lexer->current_char);
+            
+            lexer_advance(lexer);
+
+            if (lexer->current_char == '=')
+            {
+                value = realloc(value, strlen(value) + 2);
+                strcat(value, hermes_char_to_string(lexer->current_char));
+
+                lexer_advance(lexer);
+                
+                return init_token(TOKEN_NOT_EQUALS, value);
+            }
+
+            return init_token(TOKEN_NOT, value);
+        }
+
         switch(lexer->current_char)
         {
             case '"': return lexer_collect_string(lexer); break;

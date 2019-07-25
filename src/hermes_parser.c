@@ -421,7 +421,8 @@ AST_T* hermes_parser_parse_term(hermes_parser_T* hermes_parser, hermes_scope_T* 
         hermes_parser->current_token->type == TOKEN_AND ||
         hermes_parser->current_token->type == TOKEN_LESS_THAN ||
         hermes_parser->current_token->type == TOKEN_LARGER_THAN ||
-        hermes_parser->current_token->type == TOKEN_EQUALS_EQUALS
+        hermes_parser->current_token->type == TOKEN_EQUALS_EQUALS ||
+        hermes_parser->current_token->type == TOKEN_NOT_EQUALS
     )
     {
         int binop_operator = hermes_parser->current_token->type;
