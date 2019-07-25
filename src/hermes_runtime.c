@@ -14,6 +14,12 @@ static void _reference_not_registered_error(char* reference_name)
     exit(1);
 }
 
+static void _multiple_variable_definitions_error(char* variable_name)
+{
+    printf("The variable `%s` is already defined.\n", variable_name);
+    exit(1);
+}
+
 runtime_T* init_runtime()
 {
     runtime_T* runtime = calloc(1, sizeof(struct RUNTIME_STRUCT));
@@ -172,6 +178,31 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
 
 AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
 {
+    AST_T* vardef_global = get_variable_definition_by_name(
+        runtime,
+        runtime->scope,
+        node->variable_name
+    );
+
+    if (vardef_global != (void*) 0)
+    {
+        _multiple_variable_definitions_error(node->variable_name);
+    }
+   
+    if (node->scope)
+    { 
+        AST_T* vardef_local = get_variable_definition_by_name(
+            runtime,
+            (hermes_scope_T*) node->scope,
+            node->variable_name
+        );
+
+        if (vardef_local != (void*) 0)
+        {
+            _multiple_variable_definitions_error(node->variable_name);
+        }
+    }
+
     if (node->variable_value)
     {
         node->variable_value = runtime_visit(runtime, node->variable_value);

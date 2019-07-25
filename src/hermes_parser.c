@@ -592,7 +592,7 @@ AST_T* hermes_parser_parse_function_definition(hermes_parser_T* hermes_parser, h
         hermes_parser_eat(hermes_parser, TOKEN_RPAREN);
 
         hermes_parser_eat(hermes_parser, TOKEN_LBRACE);
-        ast_function_definition->function_definition_body = hermes_parser_parse_statements(hermes_parser, scope);
+        ast_function_definition->function_definition_body = hermes_parser_parse_statements(hermes_parser, new_scope);
         //ast_function_definition->function_definition_body->scope = (struct hermes_scope_T*) new_scope;
         hermes_parser_eat(hermes_parser, TOKEN_RBRACE);
 
