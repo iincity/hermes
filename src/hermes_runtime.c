@@ -151,12 +151,15 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
     {
         AST_T* variable_definition = get_variable_definition_by_name(runtime, local_scope, node->variable_name);
 
-        if (variable_definition->type != AST_VARIABLE_DEFINITION)
-            return variable_definition;
-
-        if (variable_definition)
+        if (variable_definition != (void*) 0)
         {
-            return runtime_visit(runtime, variable_definition->variable_value);
+            if (variable_definition->type != AST_VARIABLE_DEFINITION)
+                return variable_definition;
+
+            if (variable_definition)
+            {
+                return runtime_visit(runtime, variable_definition->variable_value);
+            }
         }
     }
 
@@ -164,12 +167,15 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
     {
         AST_T* variable_definition = get_variable_definition_by_name(runtime, global_scope, node->variable_name);
 
-        if (variable_definition->type != AST_VARIABLE_DEFINITION)
-            return variable_definition;
-
-        if (variable_definition)
+        if (variable_definition != (void*) 0)
         {
-            return runtime_visit(runtime, variable_definition->variable_value);
+            if (variable_definition->type != AST_VARIABLE_DEFINITION)
+                return variable_definition;
+
+            if (variable_definition)
+            {
+                return runtime_visit(runtime, variable_definition->variable_value);
+            }
         }
     }
 
@@ -184,11 +190,11 @@ AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
         node->variable_name
     );
 
-    /* ================== TODO: implement this again
-    if (vardef_global != (void*) 0)
+    /* TODO: fix this!
+     * if (vardef_global != (void*) 0)
     {
         _multiple_variable_definitions_error(node->variable_name);
-    }
+    }*/
    
     if (node->scope)
     { 
@@ -202,7 +208,7 @@ AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
         {
             _multiple_variable_definitions_error(node->variable_name);
         }
-    }*/
+    }
 
     if (node->variable_value)
     {
@@ -309,51 +315,8 @@ AST_T* runtime_visit_function_definition(runtime_T* runtime, AST_T* node)
     return node;
 }
 
-AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
-{    
-    hermes_scope_T* scope = get_scope(runtime, node);
-
-    // TODO: remove this `if` and make a more beautiful implementation of
-    // built-in methods.
-    if (strcmp(node->function_call_name, "print") == 0)
-    {
-        for (int x = 0; x < node->function_call_arguments->size; x++)
-        {
-            AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
-            AST_T* visited = runtime_visit(runtime, ast_arg);
-
-            switch (visited->type)
-            {
-                case AST_NULL: printf("NULL\n"); break;
-                case AST_STRING: printf("%s\n", visited->string_value); break;
-                case AST_CHAR: printf("%c\n", visited->char_value); break;
-                case AST_INTEGER: printf("%d\n", visited->int_value); break;
-                case AST_FLOAT: printf("%0.6f\n", visited->float_value); break;
-                case AST_BOOLEAN: printf("%d\n", visited->boolean_value); break;
-                case AST_OBJECT: printf("{ object }\n"); break;
-                case AST_LIST: printf("[ list ]\n"); break;
-            }
-        }
-
-        return init_ast(AST_NOOP);
-    }
-
-    if (strcmp(node->function_call_name, "dload") == 0)
-    {
-        AST_T* ast_arg_0 = (AST_T*) node->function_call_arguments->items[0];
-        AST_T* visited_0 = runtime_visit(runtime, ast_arg_0);
-
-        AST_T* ast_arg_1 = (AST_T*) node->function_call_arguments->items[1];
-        AST_T* visited_1 = runtime_visit(runtime, ast_arg_1);
-
-        AST_T* fdef = get_dl_function(visited_0->string_value, visited_1->string_value);
-        fdef->scope = (struct hermes_scope_T*) scope;
-
-        runtime_visit(runtime, fdef);
-
-        return fdef;
-    } 
-
+AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T* node)
+{
     for (int i = 0; i < scope->function_definitions->size; i++)
     {
         AST_T* function_definition = (AST_T*) scope->function_definitions->items[i];  
@@ -399,6 +362,75 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
             return runtime_visit(runtime, function_definition->function_definition_body);
         }
     }
+
+    return (void*) 0;
+}
+
+AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
+{    
+    hermes_scope_T* scope = get_scope(runtime, node);
+
+    // TODO: remove this `if` and make a more beautiful implementation of
+    // built-in methods.
+    if (strcmp(node->function_call_name, "print") == 0)
+    {
+        for (int x = 0; x < node->function_call_arguments->size; x++)
+        {
+            AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
+            AST_T* visited = runtime_visit(runtime, ast_arg);
+
+            switch (visited->type)
+            {
+                case AST_NULL: printf("NULL\n"); break;
+                case AST_STRING: printf("%s\n", visited->string_value); break;
+                case AST_CHAR: printf("%c\n", visited->char_value); break;
+                case AST_INTEGER: printf("%d\n", visited->int_value); break;
+                case AST_FLOAT: printf("%0.6f\n", visited->float_value); break;
+                case AST_BOOLEAN: printf("%d\n", visited->boolean_value); break;
+                case AST_OBJECT: printf("{ object }\n"); break;
+                case AST_LIST: printf("[ list ]\n"); break;
+            }
+        }
+
+        return init_ast(AST_NOOP);
+    }
+
+    if (strcmp(node->function_call_name, "dload") == 0)
+    {
+        AST_T* ast_arg_0 = (AST_T*) node->function_call_arguments->items[0];
+        AST_T* visited_0 = runtime_visit(runtime, ast_arg_0);
+
+        AST_T* ast_arg_1 = (AST_T*) node->function_call_arguments->items[1];
+        AST_T* visited_1 = runtime_visit(runtime, ast_arg_1);
+
+        AST_T* fdef = get_dl_function(visited_0->string_value, visited_1->string_value);
+        fdef->scope = (struct hermes_scope_T*) scope;
+
+        runtime_visit(runtime, fdef);
+
+        return fdef;
+    } 
+
+    if (node->scope != (void*) 0)
+    {
+        AST_T* local_scope_func_def = runtime_function_lookup(
+            runtime,
+            (hermes_scope_T*) node->scope,
+            node
+        );
+
+        if (local_scope_func_def)
+            return local_scope_func_def;
+    }
+
+    AST_T* global_scope_func_def = runtime_function_lookup(
+        runtime,
+        runtime->scope,
+        node
+    );
+
+    if (global_scope_func_def)
+        return global_scope_func_def;
 
     printf("Undefined method %s\n", node->function_call_name); exit(1);
 }

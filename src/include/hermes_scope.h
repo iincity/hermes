@@ -12,4 +12,8 @@ typedef struct HERMES_SCOPE_STRUCT
 } hermes_scope_T;
 
 hermes_scope_T* init_hermes_scope();
+
+void hermes_scope_clear_variable_definitions(hermes_scope_T* scope);
+
+void hermes_scope_clear_function_definitions(hermes_scope_T* scope);
 #endif
