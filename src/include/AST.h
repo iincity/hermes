@@ -66,6 +66,7 @@ typedef struct AST_STRUCT
     struct AST_STRUCT* while_body;
     struct AST_STRUCT* return_value;
     struct AST_STRUCT* list_access_pointer;
+    struct AST_STRUCT* saved_function_call;
     
     struct hermes_scope_T* scope;
 

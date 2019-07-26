@@ -127,9 +127,6 @@ AST_T* get_variable_definition_by_name(runtime_T* runtime, hermes_scope_T* scope
 
                 return runtime_visit(runtime, runtime_reference->object);
             }
- 
-            if (!variable_definition->variable_value)
-                return variable_definition;
 
             return variable_definition;
         }
@@ -145,7 +142,41 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
     hermes_scope_T* local_scope = (hermes_scope_T*) node->scope;
     hermes_scope_T* global_scope = runtime->scope;
 
-    hermes_scope_T* scope = get_scope(runtime, node); 
+    if (node->object_children != (void*) 0)
+    {
+        if (node->object_children->size > 0)
+        {
+            for (int i = 0; i < node->object_children->size; i++)
+            {
+                AST_T* object_var_def = (AST_T*) node->object_children->items[i];
+
+                if (object_var_def->type != AST_VARIABLE_DEFINITION)
+                    continue;
+
+                if (strcmp(object_var_def->variable_name, node->variable_name) == 0)
+                {
+                    if (strcmp(object_var_def->variable_type->type_value, "ref") == 0)
+                    {
+                        runtime_reference_T* runtime_reference = runtime_get_reference(
+                            runtime,
+                            node->variable_name
+                        );
+
+                        if (runtime_reference == (void*) 0)
+                            _reference_not_registered_error(node->variable_name);
+
+                        return runtime_visit(runtime, runtime_reference->object);
+                    }
+         
+                    if (!object_var_def->variable_value)
+                        return object_var_def;
+
+                    return runtime_visit(runtime, object_var_def->variable_value);
+                }
+            }
+        }
+    }
+
 
     if (local_scope)
     {
@@ -190,11 +221,10 @@ AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
         node->variable_name
     );
 
-    /* TODO: fix this!
-     * if (vardef_global != (void*) 0)
+    if (vardef_global != (void*) 0)
     {
         _multiple_variable_definitions_error(node->variable_name);
-    }*/
+    }
    
     if (node->scope)
     { 
@@ -210,18 +240,35 @@ AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
         }
     }
 
-    if (node->variable_value)
+    if (node->saved_function_call != (void*) 0)
     {
-        node->variable_value = runtime_visit(runtime, node->variable_value);
+        node->variable_value = node->saved_function_call;
     }
     else
     {
-        node->variable_value = init_ast(AST_NULL);
+        if (node->variable_value)
+        {
+            if (node->variable_value->type == AST_FUNCTION_CALL)
+                node->saved_function_call = node->variable_value;
+
+            node->variable_value = runtime_visit(runtime, node->variable_value);
+        }
+        else
+        {
+            node->variable_value = init_ast(AST_NULL);
+        }
     }
 
     dynamic_list_append(get_scope(runtime, node)->variable_definitions, node);
 
-    return node;
+    if (node->variable_value)
+    {
+        return node->variable_value;
+    }
+    else
+    {
+        return node;
+    }
 }
 
 AST_T* runtime_visit_variable_assignment(runtime_T* runtime, AST_T* node)
@@ -230,17 +277,57 @@ AST_T* runtime_visit_variable_assignment(runtime_T* runtime, AST_T* node)
     AST_T* value = (void*) 0;
 
     AST_T* left = node->variable_assignment_left;
-    hermes_scope_T* variable_scope = get_scope(runtime, node);
+    hermes_scope_T* local_scope = (hermes_scope_T*) node->scope;
+    hermes_scope_T* global_scope = runtime->scope;
 
-    for (int i = 0; i < variable_scope->variable_definitions->size; i++)
+    if (node->object_children != (void*) 0)
     {
-        AST_T* ast_variable_definition = (AST_T*) variable_scope->variable_definitions->items[i];
-
-        if (strcmp(ast_variable_definition->variable_name, left->variable_name) == 0)
+        if (node->object_children->size > 0)
         {
-            value = runtime_visit(runtime, node->variable_value);
-            ast_variable_definition->variable_value = value;
-            return value;
+            for (int i = 0; i < node->object_children->size; i++)
+            {
+                AST_T* object_var_def = (AST_T*) node->object_children->items[i];
+
+                if (object_var_def->type != AST_VARIABLE_DEFINITION)
+                    continue;
+
+                if (strcmp(object_var_def->variable_name, left->variable_name) == 0)
+                {
+                    value = runtime_visit(runtime, node->variable_value);
+                    object_var_def->variable_value = value;
+                    return value;
+                }
+            }
+        }
+    }
+
+    if (local_scope != (void*) 0)
+    {
+        for (int i = 0; i < local_scope->variable_definitions->size; i++)
+        {
+            AST_T* ast_variable_definition = (AST_T*) local_scope->variable_definitions->items[i];
+
+            if (strcmp(ast_variable_definition->variable_name, left->variable_name) == 0)
+            {
+                value = runtime_visit(runtime, node->variable_value);
+                ast_variable_definition->variable_value = value;
+                return value;
+            }
+        }
+    }
+
+    if (global_scope != (void*) 0)
+    {
+        for (int i = 0; i < global_scope->variable_definitions->size; i++)
+        {
+            AST_T* ast_variable_definition = (AST_T*) global_scope->variable_definitions->items[i];
+
+            if (strcmp(ast_variable_definition->variable_name, left->variable_name) == 0)
+            {
+                value = runtime_visit(runtime, node->variable_value);
+                ast_variable_definition->variable_value = value;
+                return value;
+            }
         }
     }
 
@@ -457,11 +544,12 @@ AST_T* runtime_visit_float(runtime_T* runtime, AST_T* node)
 
 AST_T* runtime_visit_object(runtime_T* runtime, AST_T* node)
 {
-    for (int i = 0; i < node->object_children->size; i++)
+    // This is stupid ...
+    /*for (int i = 0; i < node->object_children->size; i++)
     {
         AST_T* child = (AST_T*) node->object_children->items[i];
         node->object_children->items[i] = runtime_visit(runtime, child);
-    }
+    }*/
 
     return node;
 }
@@ -541,21 +629,27 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
     {
         if (node->binop_right->type == AST_VARIABLE)
         {
-            if (node->binop_right->type == AST_VARIABLE)
+            if (strcmp(node->binop_right->variable_name, "length") == 0)
             {
-                if (strcmp(node->binop_right->variable_name, "length") == 0)
-                {
-                    AST_T* int_ast = init_ast(AST_INTEGER);
-                    int_ast->int_value = left->list_children->size;
+                AST_T* int_ast = init_ast(AST_INTEGER);
+                int_ast->int_value = left->list_children->size;
 
-                    return int_ast;
-                }
+                return int_ast;
             }
+        }
+    }
+    else
+    if (left->type == AST_OBJECT)
+    {
+        if (node->binop_right->type == AST_VARIABLE || node->binop_right->type == AST_VARIABLE_ASSIGNMENT)
+        {
+            node->binop_right->object_children = left->object_children;
+            node->object_children = left->object_children;
         }
     }
 
     node->scope = (struct hermes_scope_T*) get_scope(runtime, left);
-    node->binop_right->scope = node->scope;
+    //node->binop_right->scope = node->scope;
 
     return runtime_visit(runtime, node->binop_right);
 }

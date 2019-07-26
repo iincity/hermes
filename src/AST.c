@@ -10,6 +10,8 @@ AST_T* init_ast(int type)
     AST->scope = (void*) 0;
     AST->return_value = (void*) 0;
     AST->fptr = (void*) 0;
+    AST->object_children = (void*) 0;
+    AST->saved_function_call = (void*) 0;
 
     return AST;
 }

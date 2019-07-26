@@ -263,6 +263,7 @@ AST_T* hermes_parser_parse_variable(hermes_parser_T* hermes_parser, hermes_scope
         AST_T* ast_assign = init_ast(AST_VARIABLE_ASSIGNMENT);
         ast_assign->variable_assignment_left = ast_variable;
         ast_assign->variable_value = hermes_parser_parse_expr(hermes_parser, scope);
+        ast_assign->scope = (struct hermes_scope_T*) scope;
 
         return ast_assign;
     }
@@ -280,6 +281,7 @@ AST_T* hermes_parser_parse_variable(hermes_parser_T* hermes_parser, hermes_scope
         ast_variable_modifier->binop_left = ast_variable;
         ast_variable_modifier->binop_right = hermes_parser_parse_expr(hermes_parser, scope);
         ast_variable_modifier->binop_operator = type;
+        ast_variable_modifier->scope = (struct hermes_scope_T*) scope;
 
         return ast_variable_modifier;
     }

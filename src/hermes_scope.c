@@ -12,6 +12,8 @@ hermes_scope_T* init_hermes_scope()
 
 static void free_variable_definition(void* n)
 {
+    return; // TODO: fix
+
     AST_T* node = (AST_T*) n;
 
     free(node->variable_name);
@@ -24,6 +26,8 @@ static void free_variable_definition(void* n)
 
 static void free_function_definition(void* n)
 {
+    return; // TODO: fix
+
     AST_T* node = (AST_T*) n;
 
     free(node->function_name);
