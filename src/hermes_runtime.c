@@ -360,6 +360,23 @@ AST_T* runtime_visit_variable_modifier(runtime_T* runtime, AST_T* node)
     {
         AST_T* ast_variable_definition = (AST_T*) variable_scope->variable_definitions->items[i];
 
+        if (node->object_children != (void*) 0)
+        {
+            for (int i = 0; i < node->object_children->size; i++)
+            {
+                AST_T* object_var_def = (AST_T*) node->object_children->items[i];
+
+                if (object_var_def->type != AST_VARIABLE_DEFINITION)
+                    continue;
+
+                if (strcmp(object_var_def->variable_name, left->variable_name) == 0)
+                {
+                    ast_variable_definition = object_var_def;
+                    break;
+                }
+            }
+        }
+
         if (strcmp(ast_variable_definition->variable_name, left->variable_name) == 0)
         {
             value = runtime_visit(runtime, node->binop_right);
@@ -655,7 +672,7 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
     else
     if (left->type == AST_OBJECT)
     {
-        if (node->binop_right->type == AST_VARIABLE || node->binop_right->type == AST_VARIABLE_ASSIGNMENT)
+        if (node->binop_right->type == AST_VARIABLE || node->binop_right->type == AST_VARIABLE_ASSIGNMENT || node->binop_right->type == AST_VARIABLE_MODIFIER)
         {
             node->binop_right->object_children = left->object_children;
             node->object_children = left->object_children;
