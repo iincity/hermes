@@ -294,6 +294,10 @@ AST_T* runtime_visit_variable_assignment(runtime_T* runtime, AST_T* node)
                 if (strcmp(object_var_def->variable_name, left->variable_name) == 0)
                 {
                     value = runtime_visit(runtime, node->variable_value);
+
+                    if (value->type == AST_FLOAT)
+                        value->int_value = (int) value->float_value;
+
                     object_var_def->variable_value = value;
                     return value;
                 }
@@ -303,31 +307,41 @@ AST_T* runtime_visit_variable_assignment(runtime_T* runtime, AST_T* node)
 
     if (local_scope != (void*) 0)
     {
-        for (int i = 0; i < local_scope->variable_definitions->size; i++)
-        {
-            AST_T* ast_variable_definition = (AST_T*) local_scope->variable_definitions->items[i];
+        AST_T* variable_definition = get_variable_definition_by_name(
+            runtime,
+            local_scope,
+            left->variable_name
+        );
 
-            if (strcmp(ast_variable_definition->variable_name, left->variable_name) == 0)
-            {
-                value = runtime_visit(runtime, node->variable_value);
-                ast_variable_definition->variable_value = value;
-                return value;
-            }
+        if (variable_definition != (void*) 0)
+        {
+            value = runtime_visit(runtime, node->variable_value);
+
+            if (value->type == AST_FLOAT)
+                value->int_value = (int) value->float_value;
+
+            variable_definition->variable_value = value;
+            return value;
         }
     }
 
     if (global_scope != (void*) 0)
     {
-        for (int i = 0; i < global_scope->variable_definitions->size; i++)
-        {
-            AST_T* ast_variable_definition = (AST_T*) global_scope->variable_definitions->items[i];
+        AST_T* variable_definition = get_variable_definition_by_name(
+            runtime,
+            global_scope,
+            left->variable_name
+        );
 
-            if (strcmp(ast_variable_definition->variable_name, left->variable_name) == 0)
-            {
-                value = runtime_visit(runtime, node->variable_value);
-                ast_variable_definition->variable_value = value;
-                return value;
-            }
+        if (variable_definition != (void*) 0)
+        {
+            value = runtime_visit(runtime, node->variable_value);
+
+            if (value->type == AST_FLOAT)
+                value->int_value = (int) value->float_value;
+
+            variable_definition->variable_value = value;
+            return value;
         }
     }
 
