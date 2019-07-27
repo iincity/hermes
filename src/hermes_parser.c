@@ -97,7 +97,6 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
 
             hermes_parser_eat(hermes_parser, TOKEN_ID);
 
-
             AST_T* a = (void*) 0;
 
             if (hermes_parser->current_token->type == TOKEN_LPAREN)
@@ -382,7 +381,16 @@ AST_T* hermes_parser_parse_factor(hermes_parser_T* hermes_parser, hermes_scope_T
 
         if (a)
             return a;
-    } 
+    }
+
+   if (hermes_parser->current_token->type == TOKEN_LPAREN)
+   {
+       hermes_parser_eat(hermes_parser, TOKEN_LPAREN);
+       AST_T* ast_expr = hermes_parser_parse_expr(hermes_parser, scope);
+       hermes_parser_eat(hermes_parser, TOKEN_RPAREN);
+
+       return ast_expr;
+   } 
 
     switch (hermes_parser->current_token->type)
     {
