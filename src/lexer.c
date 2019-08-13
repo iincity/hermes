@@ -30,7 +30,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
 {
     while (lexer->current_char != '\0' && lexer->char_index < strlen(lexer->contents) - 1)
     {
-        while (lexer->current_char == ' ' || (int) lexer->current_char == 10)
+        while (lexer->current_char == ' ' || (int) lexer->current_char == 10 || (int) lexer->current_char == 13)
             lexer_skip_whitespace(lexer);
 
         if (isdigit(lexer->current_char))
@@ -207,7 +207,7 @@ void lexer_expect_char(lexer_T* lexer, char c)
 
 void lexer_skip_whitespace(lexer_T* lexer)
 {
-    while (lexer->current_char == ' ' || (int) lexer->current_char == 10)
+    while (lexer->current_char == ' ' || (int) lexer->current_char == 10 || (int) lexer->current_char == 13)
         lexer_advance(lexer);
 }
 
