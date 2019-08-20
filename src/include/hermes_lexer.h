@@ -13,6 +13,8 @@ typedef struct HERMES_LEXER_STRUCT
 
 hermes_lexer_T* init_hermes_lexer(char* contents);
 
+void hermes_lexer_free(hermes_lexer_T* hermes_lexer);
+
 token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer);
 
 token_T* hermes_lexer_advance_with_token(hermes_lexer_T* hermes_lexer, int type);
@@ -31,7 +33,5 @@ token_T* hermes_lexer_collect_number(hermes_lexer_T* hermes_lexer);
 
 token_T* hermes_lexer_collect_id(hermes_lexer_T* hermes_lexer);
 
-void hermes_lexer_dump(hermes_lexer_T* hermes_lexer);
-
-void hermes_lexer_free(hermes_lexer_T* hermes_lexer);
+char* hermes_lexer_current_charstr(hermes_lexer_T* hermes_lexer);
 #endif
