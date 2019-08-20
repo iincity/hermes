@@ -115,17 +115,20 @@ AST_T* get_variable_definition_by_name(runtime_T* runtime, hermes_scope_T* scope
 
         if (strcmp(variable_definition->variable_name, variable_name) == 0)
         {
-            if (strcmp(variable_definition->variable_type->type_value, "ref") == 0)
+            if (variable_definition->variable_type)
             {
-                runtime_reference_T* runtime_reference = runtime_get_reference(
-                    runtime,
-                    variable_name
-                );
+                if (strcmp(variable_definition->variable_type->type_value, "ref") == 0)
+                {
+                    runtime_reference_T* runtime_reference = runtime_get_reference(
+                        runtime,
+                        variable_name
+                    );
 
-                if (runtime_reference == (void*) 0)
-                    _reference_not_registered_error(variable_name);
+                    if (runtime_reference == (void*) 0)
+                        _reference_not_registered_error(variable_name);
 
-                return runtime_visit(runtime, runtime_reference->object);
+                    return runtime_visit(runtime, runtime_reference->object);
+                }
             }
 
             return variable_definition;

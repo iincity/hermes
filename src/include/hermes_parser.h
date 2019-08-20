@@ -1,6 +1,6 @@
 #ifndef HERMES_PARSER_H
 #define HERMES_PARSER_H
-#include "lexer.h"
+#include "hermes_lexer.h"
 #include "AST.h"
 #include "token.h"
 #include "hermes_scope.h"
@@ -8,12 +8,12 @@
 
 typedef struct HERMES_PARSER_STRUCT
 {
-    lexer_T* lexer;
+    hermes_lexer_T* hermes_lexer;
     token_T* prev_token;
     token_T* current_token;
 } hermes_parser_T;
 
-hermes_parser_T* init_hermes_parser(lexer_T* lexer);
+hermes_parser_T* init_hermes_parser(hermes_lexer_T* hermes_lexer);
 
 // etc
 

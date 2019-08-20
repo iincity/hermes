@@ -21,18 +21,18 @@ const char* VALUE_FALSE = "false";
 const char* VALUE_TRUE = "true";
 const char* VALUE_NULL = "NULL";
 
-hermes_parser_T* init_hermes_parser(lexer_T* lexer)
+hermes_parser_T* init_hermes_parser(hermes_lexer_T* hermes_lexer)
 {
     hermes_parser_T* hermes_parser = calloc(1, sizeof(struct HERMES_PARSER_STRUCT));
-    hermes_parser->lexer = lexer;
-    hermes_parser->current_token = lexer_get_next_token(hermes_parser->lexer);
+    hermes_parser->hermes_lexer = hermes_lexer;
+    hermes_parser->current_token = hermes_lexer_get_next_token(hermes_parser->hermes_lexer);
 }
 
 // etc
 
 void hermes_parser_type_error(hermes_parser_T* hermes_parser)
 {
-    printf("[Line %d] Invalid type for assigned value\n", hermes_parser->lexer->line_n);
+    printf("[Line %d] Invalid type for assigned value\n", hermes_parser->hermes_lexer->line_n);
     exit(1);
 }
 
@@ -47,7 +47,7 @@ AST_T* hermes_parser_eat(hermes_parser_T* hermes_parser, int token_type)
     {
         printf(
             "[Line %d] Unexpected token `%s`, was expecting `%d`.\n",
-            hermes_parser->lexer->line_n,
+            hermes_parser->hermes_lexer->line_n,
             hermes_parser->current_token->value,
             token_type
         );
@@ -56,7 +56,7 @@ AST_T* hermes_parser_eat(hermes_parser_T* hermes_parser, int token_type)
     else if (hermes_parser->current_token->type == token_type)
     {
         hermes_parser->prev_token = hermes_parser->current_token;
-        hermes_parser->current_token = lexer_get_next_token(hermes_parser->lexer);
+        hermes_parser->current_token = hermes_lexer_get_next_token(hermes_parser->hermes_lexer);
     }
 }
 
