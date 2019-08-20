@@ -61,7 +61,7 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             int type = TOKEN_PLUS;
             hermes_lexer_advance(hermes_lexer);
 
-            if (hermes_lexer->current_char == '=')
+            if (hermes_lexer->current_char == '=')  // +=
             {
                 type = TOKEN_PLUS_EQUALS;
                 value = realloc(value, strlen(value) + 2);
@@ -82,7 +82,7 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             int type = TOKEN_MINUS;
             hermes_lexer_advance(hermes_lexer);
 
-            if (hermes_lexer->current_char == '=')
+            if (hermes_lexer->current_char == '=')  // -=
             {
                 type = TOKEN_MINUS_EQUALS;
                 value = realloc(value, strlen(value) + 2);
@@ -103,7 +103,7 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             int type = TOKEN_STAR;
             hermes_lexer_advance(hermes_lexer);
 
-            if (hermes_lexer->current_char == '=')
+            if (hermes_lexer->current_char == '=')  // *=
             {
                 type = TOKEN_STAR_EQUALS;
                 value = realloc(value, strlen(value) + 2);
@@ -123,7 +123,7 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             
             hermes_lexer_advance(hermes_lexer);
 
-            if (hermes_lexer->current_char == '&')
+            if (hermes_lexer->current_char == '&')  // &&
             {
                 value = realloc(value, strlen(value) + 2);
                 char* strchar = hermes_lexer_current_charstr(hermes_lexer);
@@ -142,7 +142,7 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             
             hermes_lexer_advance(hermes_lexer);
 
-            if (hermes_lexer->current_char == '=')
+            if (hermes_lexer->current_char == '=')  // ==
             {
                 value = realloc(value, strlen(value) + 2);
                 char* strchar = hermes_lexer_current_charstr(hermes_lexer);
@@ -165,7 +165,7 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             
             hermes_lexer_advance(hermes_lexer);
 
-            if (hermes_lexer->current_char == '=')
+            if (hermes_lexer->current_char == '=')  // !=
             {
                 value = realloc(value, strlen(value) + 2);
                 char* strchar = hermes_lexer_current_charstr(hermes_lexer);
