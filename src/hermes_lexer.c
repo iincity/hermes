@@ -201,7 +201,7 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
         }
     }
 
-    init_token(TOKEN_EOF, "\0");
+    return init_token(TOKEN_EOF, "\0");
 }
 
 /**
