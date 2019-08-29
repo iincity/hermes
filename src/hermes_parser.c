@@ -26,6 +26,8 @@ hermes_parser_T* init_hermes_parser(hermes_lexer_T* hermes_lexer)
     hermes_parser_T* hermes_parser = calloc(1, sizeof(struct HERMES_PARSER_STRUCT));
     hermes_parser->hermes_lexer = hermes_lexer;
     hermes_parser->current_token = hermes_lexer_get_next_token(hermes_parser->hermes_lexer);
+    
+    return hermes_parser;
 }
 
 // etc
