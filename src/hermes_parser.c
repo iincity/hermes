@@ -151,13 +151,18 @@ AST_T* hermes_parser_parse_statements(hermes_parser_T* hermes_parser, hermes_sco
 
     compound->compound_value = init_dynamic_list(sizeof(struct AST_STRUCT));
 
-    dynamic_list_append(compound->compound_value, hermes_parser_parse_statement(hermes_parser, scope));
+    AST_T* statement = hermes_parser_parse_statement(hermes_parser, scope);
 
-    while (hermes_parser->current_token->type == TOKEN_SEMI)
+    dynamic_list_append(compound->compound_value, statement);
+
+    while (hermes_parser->current_token->type == TOKEN_SEMI || statement->type != AST_NOOP)
     {
+        if (hermes_parser->current_token->type == TOKEN_SEMI)
+            hermes_parser_eat(hermes_parser, TOKEN_SEMI);
 
-        hermes_parser_eat(hermes_parser, TOKEN_SEMI);
-        dynamic_list_append(compound->compound_value, hermes_parser_parse_statement(hermes_parser, scope));
+        statement = hermes_parser_parse_statement(hermes_parser, scope);
+
+        dynamic_list_append(compound->compound_value, statement);
     }
 
     return compound;
