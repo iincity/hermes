@@ -389,36 +389,42 @@ AST_T* runtime_visit_variable_modifier(runtime_T* runtime, AST_T* node)
                 case TOKEN_PLUS_EQUALS: {
                     if (strcmp(ast_variable_definition->variable_type->type_value, "int") == 0)
                     {
-                        ast_variable_definition->variable_value->int_value += value->int_value;
+                        ast_variable_definition->variable_value->int_value += value->int_value ? value->int_value : value->float_value;
+                        ast_variable_definition->variable_value->float_value = (float) ast_variable_definition->variable_value->int_value;
                         return ast_variable_definition->variable_value;
                     }
                     else if (strcmp(ast_variable_definition->variable_type->type_value, "float") == 0)
                     {
-                        ast_variable_definition->variable_value->float_value += value->float_value;
+                        ast_variable_definition->variable_value->float_value += value->float_value ? value->float_value : value->int_value;
+                        ast_variable_definition->variable_value->int_value = (int) ast_variable_definition->variable_value->float_value;
                         return ast_variable_definition->variable_value;
                     }
                 } break;
                 case TOKEN_MINUS_EQUALS: {
                     if (strcmp(ast_variable_definition->variable_type->type_value, "int") == 0)
                     {
-                        ast_variable_definition->variable_value->int_value -= value->int_value;
+                        ast_variable_definition->variable_value->int_value -= value->int_value ? value->int_value : value->float_value;
+                        ast_variable_definition->variable_value->float_value = (float) ast_variable_definition->variable_value->int_value;
                         return ast_variable_definition->variable_value;
                     }
                     else if (strcmp(ast_variable_definition->variable_type->type_value, "float") == 0)
                     {
-                        ast_variable_definition->variable_value->float_value -= value->float_value;
+                        ast_variable_definition->variable_value->float_value -= value->float_value ? value->float_value : value->int_value;
+                        ast_variable_definition->variable_value->int_value = (int) ast_variable_definition->variable_value->float_value;
                         return ast_variable_definition->variable_value;
                     }
                 } break;
                 case TOKEN_STAR_EQUALS: {
                     if (strcmp(ast_variable_definition->variable_type->type_value, "int") == 0)
                     {
-                        ast_variable_definition->variable_value->int_value *= value->int_value;
+                        ast_variable_definition->variable_value->int_value *= value->int_value ? value->int_value : value->float_value;
+                        ast_variable_definition->variable_value->float_value = (float) ast_variable_definition->variable_value->int_value;
                         return ast_variable_definition->variable_value;
                     }
                     else if (strcmp(ast_variable_definition->variable_type->type_value, "float") == 0)
                     {
-                        ast_variable_definition->variable_value->float_value *= value->float_value;
+                        ast_variable_definition->variable_value->float_value *= value->float_value ? value->float_value : value->int_value;
+                        ast_variable_definition->variable_value->int_value = (int) ast_variable_definition->variable_value->float_value;
                         return ast_variable_definition->variable_value;
                     }
                 } break;
