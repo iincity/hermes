@@ -122,7 +122,7 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
                 a = ast;
             }
 
-            if (hermes_parser->current_token->type == TOKEN_LBRACKET)
+            while (hermes_parser->current_token->type == TOKEN_LBRACKET)
             {
                 AST_T* ast_list_access = init_ast(AST_LIST_ACCESS);
                 ast_list_access->binop_left = a;
@@ -130,7 +130,7 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
                 ast_list_access->list_access_pointer = hermes_parser_parse_expr(hermes_parser, scope);
                 hermes_parser_eat(hermes_parser, TOKEN_RBRACKET);
 
-                return ast_list_access;
+                a = ast_list_access;
             }
 
             if (a)
@@ -380,7 +380,7 @@ AST_T* hermes_parser_parse_factor(hermes_parser_T* hermes_parser, hermes_scope_T
             a = ast;
         }
 
-        if (hermes_parser->current_token->type == TOKEN_LBRACKET)
+        while (hermes_parser->current_token->type == TOKEN_LBRACKET)
         {
             AST_T* ast_list_access = init_ast(AST_LIST_ACCESS);
             ast_list_access->binop_left = a;
@@ -388,7 +388,7 @@ AST_T* hermes_parser_parse_factor(hermes_parser_T* hermes_parser, hermes_scope_T
             ast_list_access->list_access_pointer = hermes_parser_parse_expr(hermes_parser, scope);
             hermes_parser_eat(hermes_parser, TOKEN_RBRACKET);
 
-            return ast_list_access;
+            a = ast_list_access;
         }
 
         if (a)
