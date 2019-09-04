@@ -646,6 +646,9 @@ AST_T* runtime_visit_type(runtime_T* runtime, AST_T* node)
 
 AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
 {
+    if (node->object_children)
+        node->binop_left->object_children = node->object_children;
+
     AST_T* left = runtime_visit(runtime, node->binop_left);
 
     if (left->type == AST_VARIABLE_DEFINITION)
@@ -681,7 +684,7 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
     else
     if (left->type == AST_OBJECT)
     {
-        if (node->binop_right->type == AST_VARIABLE || node->binop_right->type == AST_VARIABLE_ASSIGNMENT || node->binop_right->type == AST_VARIABLE_MODIFIER)
+        if (node->binop_right->type == AST_VARIABLE || node->binop_right->type == AST_VARIABLE_ASSIGNMENT || node->binop_right->type == AST_VARIABLE_MODIFIER || node->binop_right->type == AST_ATTRIBUTE_ACCESS)
         {
             node->binop_right->object_children = left->object_children;
             node->object_children = left->object_children;
@@ -689,9 +692,10 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
     }
 
     node->scope = (struct hermes_scope_T*) get_scope(runtime, left);
-    //node->binop_right->scope = node->scope;
+    
+    AST_T* new = runtime_visit(runtime, node->binop_right);
 
-    return runtime_visit(runtime, node->binop_right);
+    return runtime_visit(runtime, new);
 }
 
 AST_T* runtime_visit_list_access(runtime_T* runtime, AST_T* node)
