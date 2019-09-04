@@ -335,7 +335,9 @@ AST_T* hermes_parser_parse_list(hermes_parser_T* hermes_parser, hermes_scope_T* 
     AST_T* ast_list = init_ast(AST_LIST);
     ast_list->scope = (struct hermes_scope_T*) scope;
     ast_list->list_children = init_dynamic_list(sizeof(struct AST_STRUCT));
-    dynamic_list_append(ast_list->list_children, hermes_parser_parse_expr(hermes_parser, scope));
+
+    if (hermes_parser->current_token->type != TOKEN_RBRACKET)
+        dynamic_list_append(ast_list->list_children, hermes_parser_parse_expr(hermes_parser, scope));
 
     while (hermes_parser->current_token->type == TOKEN_COMMA)
     {
