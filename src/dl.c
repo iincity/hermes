@@ -5,7 +5,7 @@
 AST_T* get_dl_function(char* filename, char* funcname)
 {
     void *handle;
-    struct AST_STRUCT* (*fptr)(dynamic_list_T* args);
+    struct AST_STRUCT* (*fptr)(struct AST_STRUCT* self, dynamic_list_T* args);
     char *error;
 
     handle = dlopen(filename, RTLD_LAZY);

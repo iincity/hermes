@@ -74,4 +74,6 @@ AST_T* runtime_visit_if(runtime_T* runtime, AST_T* node);
 AST_T* runtime_visit_while(runtime_T* runtime, AST_T* node);
 
 hermes_scope_T* get_scope(runtime_T* runtime, AST_T* node);
+
+void runtime_expect_args(dynamic_list_T* in_args, int argc, int args[]);
 #endif

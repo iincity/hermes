@@ -30,6 +30,8 @@ static AST_T* list_add_fptr(AST_T* self, dynamic_list_T* args)
 
 static AST_T* list_remove_fptr(AST_T* self, dynamic_list_T* args)
 {
+    runtime_expect_args(args, 1, (int[]){ AST_INTEGER });
+
     AST_T* ast_int = (AST_T*) args->items[0];
 
     if (ast_int->int_value > self->list_children->size)
@@ -1279,4 +1281,32 @@ hermes_scope_T* get_scope(runtime_T* runtime, AST_T* node)
         return runtime->scope;
 
     return (hermes_scope_T*) node->scope;
+}
+
+void runtime_expect_args(dynamic_list_T* in_args, int argc, int args[])
+{
+    if (in_args->size < argc)
+    {
+        printf("%d arguments was provided, but expected %d.\n", in_args->size, argc);
+        exit(1);
+    }
+
+    unsigned int errors = 0;
+
+    for (int i = 0; i < argc; i++)
+    {
+        AST_T* ast = (AST_T*) in_args->items[i];
+
+        if (ast->type != args[i])
+        {
+            printf("Got argument of type %d but expected %d.\n", ast->type, args[i]);
+            errors += 1;
+        }
+    }
+
+    if (errors)
+    {
+        printf("Got unexpected arguments, terminating.\n");
+        exit(1);
+    }
 }
