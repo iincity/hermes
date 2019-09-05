@@ -20,10 +20,25 @@ static void _multiple_variable_definitions_error(char* variable_name)
     exit(1);
 }
 
-AST_T* list_add_fptr(AST_T* self, dynamic_list_T* args)
+static AST_T* list_add_fptr(AST_T* self, dynamic_list_T* args)
 {
     for (int i = 0; i < args->size; i++)
         dynamic_list_append(self->list_children, args->items[i]);
+
+    return self;
+}
+
+static AST_T* list_remove_fptr(AST_T* self, dynamic_list_T* args)
+{
+    AST_T* ast_int = (AST_T*) args->items[0];
+
+    if (ast_int->int_value > self->list_children->size)
+    {
+        printf("Index out of range\n");
+        exit(1);
+    }
+
+    dynamic_list_remove(self->list_children, self->list_children->items[ast_int->int_value], (void*)0);
 
     return self;
 }
@@ -39,6 +54,11 @@ runtime_T* init_runtime()
     LIST_ADD_FUNCTION_DEFINITION->function_name = "add";
     LIST_ADD_FUNCTION_DEFINITION->fptr = list_add_fptr;
     dynamic_list_append(runtime->list_methods, LIST_ADD_FUNCTION_DEFINITION);
+
+    AST_T* LIST_REMOVE_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    LIST_REMOVE_FUNCTION_DEFINITION->function_name = "remove";
+    LIST_REMOVE_FUNCTION_DEFINITION->fptr = list_remove_fptr;
+    dynamic_list_append(runtime->list_methods, LIST_REMOVE_FUNCTION_DEFINITION);
 
     return runtime;
 }

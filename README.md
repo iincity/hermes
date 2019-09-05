@@ -61,6 +61,13 @@ list names = [];
 
 names.add("john");
 ```
+### Remove
+> To remove an item from a list by index
+```
+list names = ["john"];
+
+names.remove(0);
+```
 
 ### Int example
 > Everyone knows what an integer is.

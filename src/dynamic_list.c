@@ -65,8 +65,10 @@ void dynamic_list_remove(dynamic_list_T* dynamic_list, void* element, void (*fre
             break;
         }
     }
-    
-    free_method(dynamic_list->items[index]);
+
+    if (free_method != (void*)0)    
+        free_method(dynamic_list->items[index]);
+
     dynamic_list_shift_left(dynamic_list, index);  /* First shift the elements, then reallocate */
     void *tmp = realloc(
         dynamic_list->items, (dynamic_list->size - 1) * dynamic_list->item_size
