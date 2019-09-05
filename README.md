@@ -53,6 +53,15 @@ list colors = [
 ];
 ```
 
+### Built-in list methods
+#### Add
+> To add an item to a list:
+```C
+list names = [];
+
+names.add("john");
+```
+
 ### Int example
 > Everyone knows what an integer is.
 ```C

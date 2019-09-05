@@ -56,6 +56,7 @@ typedef struct AST_STRUCT
     dynamic_list_T* function_definition_arguments;
     dynamic_list_T* object_children;
     dynamic_list_T* list_children;
+    dynamic_list_T* function_definitions;
     struct AST_STRUCT* function_definition_body;
     struct AST_STRUCT* function_definition_type;
     struct AST_STRUCT* if_expr;
@@ -70,7 +71,7 @@ typedef struct AST_STRUCT
     
     struct hermes_scope_T* scope;
 
-    struct AST_STRUCT* (*fptr)(dynamic_list_T* args);
+    struct AST_STRUCT* (*fptr)(struct AST_STRUCT* self, dynamic_list_T* args);
 } AST_T;
 
 AST_T* init_ast(int type);

@@ -1,0 +1,5 @@
+list x = [];
+
+x.add(1);
+
+print(x[0]);

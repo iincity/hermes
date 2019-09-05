@@ -1,3 +1,5 @@
+object x = {};
+
 object person = {
     string name = "John";
     int age = 22;

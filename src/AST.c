@@ -12,6 +12,10 @@ AST_T* init_ast(int type)
     AST->fptr = (void*) 0;
     AST->object_children = (void*) 0;
     AST->saved_function_call = (void*) 0;
+    AST->function_definitions = (void*) 0;
+
+    if (type == AST_LIST)
+        AST->function_definitions = init_dynamic_list(sizeof(struct AST_STRUCT*));
 
     return AST;
 }

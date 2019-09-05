@@ -7,6 +7,7 @@ typedef struct RUNTIME_STRUCT
 {
     hermes_scope_T* scope;
     dynamic_list_T* references;
+    dynamic_list_T* list_methods;
 } runtime_T;
 
 typedef struct RUNTIME_REFERENCE_STRUCT

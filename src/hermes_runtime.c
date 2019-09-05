@@ -20,11 +20,25 @@ static void _multiple_variable_definitions_error(char* variable_name)
     exit(1);
 }
 
+AST_T* list_add_fptr(AST_T* self, dynamic_list_T* args)
+{
+    for (int i = 0; i < args->size; i++)
+        dynamic_list_append(self->list_children, args->items[i]);
+
+    return self;
+}
+
 runtime_T* init_runtime()
 {
     runtime_T* runtime = calloc(1, sizeof(struct RUNTIME_STRUCT));
     runtime->scope = init_hermes_scope();
     runtime->references = init_dynamic_list(sizeof(struct RUNTIME_REFERENCE_STRUCT));
+    runtime->list_methods = init_dynamic_list(sizeof(struct AST_STRUCT*));
+
+    AST_T* LIST_ADD_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    LIST_ADD_FUNCTION_DEFINITION->function_name = "add";
+    LIST_ADD_FUNCTION_DEFINITION->fptr = list_add_fptr;
+    dynamic_list_append(runtime->list_methods, LIST_ADD_FUNCTION_DEFINITION);
 
     return runtime;
 }
@@ -461,7 +475,7 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
                     dynamic_list_append(visited_fptr_args, visited);
                 }
 
-                return runtime_visit(runtime, (AST_T*) function_definition->fptr(visited_fptr_args));
+                return runtime_visit(runtime, (AST_T*) function_definition->fptr((AST_T*) function_definition, visited_fptr_args));
             }
 
             hermes_scope_T* function_definition_body_scope = get_scope(runtime, function_definition->function_definition_body);
@@ -596,6 +610,7 @@ AST_T* runtime_visit_object(runtime_T* runtime, AST_T* node)
 
 AST_T* runtime_visit_list(runtime_T* runtime, AST_T* node)
 {
+    node->function_definitions = runtime->list_methods;
     return node;
 }
 
@@ -679,7 +694,7 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
 
                 return int_ast;
             }
-        }
+        } 
     }
     else
     if (left->type == AST_OBJECT)
@@ -688,6 +703,36 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
         {
             node->binop_right->object_children = left->object_children;
             node->object_children = left->object_children;
+        }
+    }
+
+    // call a function attached to some sort of value.
+    if (node->binop_right->type == AST_FUNCTION_CALL)
+    {
+        if (left->function_definitions != (void*)0)
+        {
+            for (int i = 0; i < left->function_definitions->size; i++)
+            {
+                AST_T* _fdef = left->function_definitions->items[i];
+
+                if (strcmp(_fdef->function_name, node->binop_right->function_call_name) == 0)
+                {
+                    if (_fdef->fptr)
+                    {
+                        dynamic_list_T* visited_fptr_args = init_dynamic_list(sizeof(struct AST_STRUCT*));
+
+                        for (int x = 0; x < node->binop_right->function_call_arguments->size; x++)
+                        {
+                            AST_T* ast_arg = (AST_T*) node->binop_right->function_call_arguments->items[x];
+                            AST_T* visited = runtime_visit(runtime, ast_arg);
+                            dynamic_list_append(visited_fptr_args, visited);
+                        }
+
+                        return runtime_visit(runtime, (AST_T*) _fdef->fptr((AST_T*) left, visited_fptr_args));
+                    }
+
+                }
+            }
         }
     }
 
