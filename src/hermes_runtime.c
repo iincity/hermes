@@ -216,35 +216,37 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
         }
     }
 
-
-    if (local_scope)
+    if (!node->is_object_child) // nope
     {
-        AST_T* variable_definition = get_variable_definition_by_name(runtime, local_scope, node->variable_name);
-
-        if (variable_definition != (void*) 0)
+        if (local_scope)
         {
-            if (variable_definition->type != AST_VARIABLE_DEFINITION)
-                return variable_definition;
+            AST_T* variable_definition = get_variable_definition_by_name(runtime, local_scope, node->variable_name);
 
-            if (variable_definition)
+            if (variable_definition != (void*) 0)
             {
-                return runtime_visit(runtime, variable_definition->variable_value);
+                if (variable_definition->type != AST_VARIABLE_DEFINITION)
+                    return variable_definition;
+
+                if (variable_definition)
+                {
+                    return runtime_visit(runtime, variable_definition->variable_value);
+                }
             }
         }
-    }
 
-    if (global_scope)
-    {
-        AST_T* variable_definition = get_variable_definition_by_name(runtime, global_scope, node->variable_name);
-
-        if (variable_definition != (void*) 0)
+        if (global_scope)
         {
-            if (variable_definition->type != AST_VARIABLE_DEFINITION)
-                return variable_definition;
+            AST_T* variable_definition = get_variable_definition_by_name(runtime, global_scope, node->variable_name);
 
-            if (variable_definition)
+            if (variable_definition != (void*) 0)
             {
-                return runtime_visit(runtime, variable_definition->variable_value);
+                if (variable_definition->type != AST_VARIABLE_DEFINITION)
+                    return variable_definition;
+
+                if (variable_definition)
+                {
+                    return runtime_visit(runtime, variable_definition->variable_value);
+                }
             }
         }
     }
@@ -724,6 +726,7 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
         if (node->binop_right->type == AST_VARIABLE || node->binop_right->type == AST_VARIABLE_ASSIGNMENT || node->binop_right->type == AST_VARIABLE_MODIFIER || node->binop_right->type == AST_ATTRIBUTE_ACCESS)
         {
             node->binop_right->object_children = left->object_children;
+            node->binop_right->is_object_child = 1;
             node->object_children = left->object_children;
         }
     }

@@ -38,6 +38,7 @@ typedef struct AST_STRUCT
 
     int int_value;
     unsigned int boolean_value;
+    unsigned int is_object_child;
     float float_value;
     char char_value;
     char* string_value;
