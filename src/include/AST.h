@@ -51,7 +51,6 @@ typedef struct AST_STRUCT
     struct AST_STRUCT* binop_left;
     struct AST_STRUCT* binop_right;
     int binop_operator;
-    dynamic_list_T* list_value;
     dynamic_list_T* compound_value;
     dynamic_list_T* function_call_arguments;
     dynamic_list_T* function_definition_arguments;
@@ -90,4 +89,28 @@ typedef struct AST_ITEM_STRUCT
 } AST_item_T;
 
 AST_item_T* init_ast_item(char* key, void* value);
+
+AST_T* ast_copy(AST_T* ast);
+AST_T* ast_copy_object(AST_T* ast);
+AST_T* ast_copy_variable(AST_T* ast);
+AST_T* ast_copy_variable_definition(AST_T* ast);
+AST_T* ast_copy_function_definition(AST_T* ast);
+AST_T* ast_copy_string(AST_T* ast);
+AST_T* ast_copy_char(AST_T* ast);
+AST_T* ast_copy_float(AST_T* ast);
+AST_T* ast_copy_list(AST_T* ast);
+AST_T* ast_copy_boolean(AST_T* ast);
+AST_T* ast_copy_integer(AST_T* ast);
+AST_T* ast_copy_compound(AST_T* ast);
+AST_T* ast_copy_type(AST_T* ast);
+AST_T* ast_copy_attribute_access(AST_T* ast);
+AST_T* ast_copy_return(AST_T* ast);
+AST_T* ast_copy_variable_assignment(AST_T* ast);
+AST_T* ast_copy_variable_modifier(AST_T* ast);
+AST_T* ast_copy_function_call(AST_T* ast);
+AST_T* ast_copy_null(AST_T* ast);
+AST_T* ast_copy_list_access(AST_T* ast);
+AST_T* ast_copy_binop(AST_T* ast);
+AST_T* ast_copy_if(AST_T* ast);
+AST_T* ast_copy_while(AST_T* ast);
 #endif

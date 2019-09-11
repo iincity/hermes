@@ -1,0 +1,15 @@
+object get_person(string name)
+{
+    return {
+        string x = name; 
+    };
+}
+
+
+object apa = get_person("hanna");
+pprint(apa);
+print(apa.x);
+
+object bepa = get_person("sara");
+pprint(bepa);
+print(bepa.x);

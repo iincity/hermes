@@ -504,6 +504,14 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
 
             hermes_scope_T* function_definition_body_scope = get_scope(runtime, function_definition->function_definition_body);
 
+            // Clear all existing arguments to prepare for the new definitions
+            for (int i = function_definition_body_scope->variable_definitions->size; i > 0; i--)
+                dynamic_list_remove(
+                    function_definition_body_scope->variable_definitions,
+                    function_definition_body_scope->variable_definitions->items[i],
+                    (void*)0
+                );
+
             for (int x = 0; x < node->function_call_arguments->size; x++)
             {
                 AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
@@ -555,6 +563,21 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
                 case AST_OBJECT: printf("{ object }\n"); break;
                 case AST_LIST: printf("[ list ]\n"); break;
             }
+        }
+
+        return init_ast(AST_NOOP);
+    }
+
+    // TODO: remove this `if` and make a more beautiful implementation of
+    // built-in methods.
+    if (strcmp(node->function_call_name, "pprint") == 0)
+    {
+        for (int x = 0; x < node->function_call_arguments->size; x++)
+        {
+            AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
+            AST_T* visited = runtime_visit(runtime, ast_arg);
+
+            printf("%p\n", visited);
         }
 
         return init_ast(AST_NOOP);
@@ -665,7 +688,7 @@ AST_T* runtime_visit_compound(runtime_T* runtime, AST_T* node)
             {
                 if (visited->return_value)
                 {
-                    return runtime_visit(runtime, visited->return_value);
+                    return ast_copy(runtime_visit(runtime, visited->return_value));
                 }
                 else
                 {
