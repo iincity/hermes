@@ -1,15 +1,16 @@
 object get_person(string name)
 {
-    return {
-        string x = name; 
+    object o = {
+        string name;
     };
+
+    o.name = name;
+
+    return o;
 }
 
+object apa = new get_person("hanna");
+object apa2 = new get_person("bobby");
 
-object apa = get_person("hanna");
-pprint(apa);
-print(apa.x);
-
-object bepa = get_person("sara");
-pprint(bepa);
-print(bepa.x);
+print(apa.name);
+print(apa2.name);

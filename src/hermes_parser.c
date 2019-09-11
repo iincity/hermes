@@ -16,6 +16,7 @@ const char* STATEMENT_WHILE = "while";
 const char* STATEMENT_IF = "if";
 const char* STATEMENT_ELSE = "else";
 const char* STATEMENT_RETURN = "return";
+const char* STATEMENT_NEW = "new";
 
 const char* VALUE_FALSE = "false";
 const char* VALUE_TRUE = "true";
@@ -85,6 +86,9 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
 
             if (strcmp(token_value, STATEMENT_RETURN) == 0)
                 return hermes_parser_parse_return(hermes_parser, scope);
+
+            if (strcmp(token_value, STATEMENT_NEW) == 0)
+                return hermes_parser_parse_new(hermes_parser, scope);
 
             if (
                 strcmp(token_value, DATA_TYPE_VOID) == 0 ||
@@ -303,10 +307,10 @@ AST_T* hermes_parser_parse_variable(hermes_parser_T* hermes_parser, hermes_scope
 AST_T* hermes_parser_parse_object(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
 {
     AST_T* ast_object = init_ast(AST_OBJECT);
+    ast_object->scope = (struct hermes_scope_T*) scope;
     ast_object->object_children = init_dynamic_list(sizeof(struct AST_STRUCT));
     hermes_scope_T* new_scope = init_hermes_scope();
-    new_scope->owner = ast_object;
-    ast_object->scope = (struct hermes_scope_T*) new_scope;
+    new_scope->owner = scope->owner;
 
     hermes_parser_eat(hermes_parser, TOKEN_LBRACE);
 
@@ -359,6 +363,9 @@ AST_T* hermes_parser_parse_factor(hermes_parser_T* hermes_parser, hermes_scope_T
 
     if (strcmp(hermes_parser->current_token->value, VALUE_NULL) == 0)
         return hermes_parser_parse_null(hermes_parser, scope);
+
+    if (strcmp(hermes_parser->current_token->value, STATEMENT_NEW) == 0)
+        return hermes_parser_parse_new(hermes_parser, scope);
 
     if (hermes_parser->current_token->type == TOKEN_ID)
     {
@@ -539,6 +546,15 @@ AST_T* hermes_parser_parse_if(hermes_parser_T* hermes_parser, hermes_scope_T* sc
     return ast_if;
 }
 
+AST_T* hermes_parser_parse_new(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
+{
+    hermes_parser_eat(hermes_parser, TOKEN_ID);
+    AST_T* ast_new = init_ast(AST_NEW);
+    ast_new->new_value = hermes_parser_parse_expr(hermes_parser, scope);
+
+    return ast_new;
+}
+
 // loops
 
 AST_T* hermes_parser_parse_while(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
@@ -616,8 +632,8 @@ AST_T* hermes_parser_parse_function_definition(hermes_parser_T* hermes_parser, h
         hermes_parser_eat(hermes_parser, TOKEN_RPAREN);
 
         hermes_parser_eat(hermes_parser, TOKEN_LBRACE);
-        ast_function_definition->function_definition_body = hermes_parser_parse_statements(hermes_parser, scope);
-        //ast_function_definition->function_definition_body->scope = (struct hermes_scope_T*) new_scope;
+        ast_function_definition->function_definition_body = hermes_parser_parse_statements(hermes_parser, new_scope);
+        ast_function_definition->function_definition_body->scope = (struct hermes_scope_T*) new_scope;
         hermes_parser_eat(hermes_parser, TOKEN_RBRACE);
 
         return ast_function_definition;

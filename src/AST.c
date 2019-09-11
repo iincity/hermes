@@ -15,6 +15,7 @@ AST_T* init_ast(int type)
     AST->saved_function_call = (void*) 0;
     AST->function_definitions = (void*) 0;
     AST->is_object_child = 0;
+    AST->new_value = (void*) 0;
 
     if (type == AST_LIST)
         AST->function_definitions = init_dynamic_list(sizeof(struct AST_STRUCT*));

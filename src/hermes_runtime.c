@@ -125,6 +125,7 @@ AST_T* runtime_visit(runtime_T* runtime, AST_T* node)
         case AST_RETURN: return runtime_visit_return(runtime, node); break;
         case AST_IF: return runtime_visit_if(runtime, node); break;
         case AST_WHILE: return runtime_visit_while(runtime, node); break;
+        case AST_NEW: return runtime_visit_new(runtime, node); break;
         default: printf("Uncaught statement %d\n", node->type); exit(1); break;
     }
 }
@@ -216,24 +217,24 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
         }
     }
 
-    if (!node->is_object_child) // nope
+    if (local_scope)
     {
-        if (local_scope)
+        AST_T* variable_definition = get_variable_definition_by_name(runtime, local_scope, node->variable_name);
+
+        if (variable_definition != (void*) 0)
         {
-            AST_T* variable_definition = get_variable_definition_by_name(runtime, local_scope, node->variable_name);
+            if (variable_definition->type != AST_VARIABLE_DEFINITION)
+                return variable_definition;
 
-            if (variable_definition != (void*) 0)
+            if (variable_definition)
             {
-                if (variable_definition->type != AST_VARIABLE_DEFINITION)
-                    return variable_definition;
-
-                if (variable_definition)
-                {
-                    return runtime_visit(runtime, variable_definition->variable_value);
-                }
+                return runtime_visit(runtime, variable_definition->variable_value);
             }
         }
+    }
 
+    if (!node->is_object_child) // nope
+    {
         if (global_scope)
         {
             AST_T* variable_definition = get_variable_definition_by_name(runtime, global_scope, node->variable_name);
@@ -255,7 +256,7 @@ AST_T* runtime_visit_variable(runtime_T* runtime, AST_T* node)
 }
 
 AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
-{
+{ 
     AST_T* vardef_global = get_variable_definition_by_name(
         runtime,
         runtime->scope,
@@ -268,7 +269,7 @@ AST_T* runtime_visit_variable_definition(runtime_T* runtime, AST_T* node)
     }
    
     if (node->scope)
-    { 
+    {
         AST_T* vardef_local = get_variable_definition_by_name(
             runtime,
             (hermes_scope_T*) node->scope,
@@ -502,7 +503,7 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
                 return runtime_visit(runtime, (AST_T*) function_definition->fptr((AST_T*) function_definition, visited_fptr_args));
             }
 
-            hermes_scope_T* function_definition_body_scope = get_scope(runtime, function_definition->function_definition_body);
+            hermes_scope_T* function_definition_body_scope = (hermes_scope_T*) function_definition->function_definition_body->scope; 
 
             // Clear all existing arguments to prepare for the new definitions
             for (int i = function_definition_body_scope->variable_definitions->size; i > 0; i--)
@@ -645,12 +646,8 @@ AST_T* runtime_visit_float(runtime_T* runtime, AST_T* node)
 
 AST_T* runtime_visit_object(runtime_T* runtime, AST_T* node)
 {
-    // This is stupid ...
-    /*for (int i = 0; i < node->object_children->size; i++)
-    {
-        AST_T* child = (AST_T*) node->object_children->items[i];
-        node->object_children->items[i] = runtime_visit(runtime, child);
-    }*/
+    //for (int i = 0; i < node->object_children->size; i++)
+    //    node->object_children->items[i] = runtime_visit(runtime, node->object_children->items[i]);
 
     return node;
 }
@@ -688,7 +685,7 @@ AST_T* runtime_visit_compound(runtime_T* runtime, AST_T* node)
             {
                 if (visited->return_value)
                 {
-                    return ast_copy(runtime_visit(runtime, visited->return_value));
+                    return runtime_visit(runtime, visited->return_value);
                 }
                 else
                 {
@@ -1299,6 +1296,11 @@ AST_T* runtime_visit_while(runtime_T* runtime, AST_T* node)
     }
 
     return node;
+}
+
+AST_T* runtime_visit_new(runtime_T* runtime, AST_T* node)
+{
+    return ast_copy(runtime_visit(runtime, node->new_value));
 }
 
 hermes_scope_T* get_scope(runtime_T* runtime, AST_T* node)

@@ -31,7 +31,8 @@ typedef struct AST_STRUCT
         AST_ELSE,
         AST_WHILE,
         AST_ATTRIBUTE_ACCESS,
-        AST_LIST_ACCESS
+        AST_LIST_ACCESS,
+        AST_NEW
     } type;
     
     char* function_call_name;
@@ -68,6 +69,7 @@ typedef struct AST_STRUCT
     struct AST_STRUCT* return_value;
     struct AST_STRUCT* list_access_pointer;
     struct AST_STRUCT* saved_function_call;
+    struct AST_STRUCT* new_value;
     
     struct hermes_scope_T* scope;
 

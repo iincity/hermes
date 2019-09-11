@@ -112,6 +112,27 @@ ref something;
 something.x += 1;
 ```
 
+## Available statements
+* new
+
+### new example
+```C
+object get_person(string name)
+{
+    object o = {
+        string name;    
+    };
+
+    o.name = name;
+
+    return o;
+}
+
+object person = new get_person("Hanna");
+```
+> The `new` statement will always return a new address of whatever is to the
+> right of the statement.
+
 ## Notes
 ### For loops
 > For loops does not exist, you can acheive the same thing with while loops and we are trying to keep the language simple.
