@@ -27,6 +27,8 @@ hermes_parser_T* init_hermes_parser(hermes_lexer_T* hermes_lexer)
     hermes_parser_T* hermes_parser = calloc(1, sizeof(struct HERMES_PARSER_STRUCT));
     hermes_parser->hermes_lexer = hermes_lexer;
     hermes_parser->current_token = hermes_lexer_get_next_token(hermes_parser->hermes_lexer);
+
+    INITIALIZED_NOOP = init_ast(AST_NOOP);
     
     return hermes_parser;
 }
@@ -142,10 +144,10 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
 
         } break;
         case TOKEN_NUMBER_VALUE: case TOKEN_STRING_VALUE: case TOKEN_CHAR_VALUE: case TOKEN_FLOAT_VALUE: case TOKEN_INTEGER_VALUE: return hermes_parser_parse_expr(hermes_parser, scope); break;
-        default: return init_ast(AST_NOOP); break;
+        default: return INITIALIZED_NOOP; break;
     }
 
-    return init_ast(AST_NOOP);
+    return INITIALIZED_NOOP;
 }
 
 AST_T* hermes_parser_parse_statements(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
@@ -185,7 +187,7 @@ AST_T* hermes_parser_parse_type(hermes_parser_T* hermes_parser, hermes_scope_T* 
 
 AST_T* hermes_parser_parse_attribute_access(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
 {
-    return init_ast(AST_NOOP);
+    return INITIALIZED_NOOP;
 }
 
 // values
@@ -236,7 +238,7 @@ AST_T* hermes_parser_parse_integer(hermes_parser_T* hermes_parser, hermes_scope_
 
 AST_T* hermes_parser_parse_array(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
 {
-    return init_ast(AST_NOOP);
+    return INITIALIZED_NOOP;
 }
 
 AST_T* hermes_parser_parse_boolean(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
