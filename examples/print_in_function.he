@@ -1,0 +1,7 @@
+void say_hello(string message)
+{
+    print(message);
+    pprint(message);
+}
+
+say_hello("David");
