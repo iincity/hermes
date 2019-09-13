@@ -37,6 +37,5 @@ void test_hermes_lexer_behavior(void** state)
     assert_true(hermes_lexer_get_next_token(hermes_lexer)->type == TOKEN_SEMI);
 
     assert_true(hermes_lexer_get_next_token(hermes_lexer)->type == TOKEN_RBRACE);
-
-    assert_true(hermes_lexer->current_char == '}');
+    assert_true(hermes_lexer->current_char == '\0');
 }
