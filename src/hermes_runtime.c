@@ -53,6 +53,8 @@ runtime_T* init_runtime()
     runtime->references = init_dynamic_list(sizeof(struct RUNTIME_REFERENCE_STRUCT));
     runtime->list_methods = init_dynamic_list(sizeof(struct AST_STRUCT*));
 
+    INITIALIZED_NOOP = init_ast(AST_NOOP);
+
     // GLOBAL FUNCTIONS
 
     AST_T* PRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);

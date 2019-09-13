@@ -28,7 +28,7 @@ AST_T* hermes_builtin_function_print(AST_T* self, dynamic_list_T* args)
         }
     }
 
-    return init_ast(AST_NOOP);
+    return INITIALIZED_NOOP;
 }
 
 /**
@@ -44,5 +44,5 @@ AST_T* hermes_builtin_function_pprint(AST_T* self, dynamic_list_T* args)
     for (int i = 0; i < args->size; i++)
         printf("%p\n", (AST_T*) args->items[i]);
 
-    return init_ast(AST_NOOP);
+    return INITIALIZED_NOOP;
 }
