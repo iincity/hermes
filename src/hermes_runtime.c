@@ -1,4 +1,5 @@
 #include "include/hermes_runtime.h"
+#include "include/hermes_builtins.h"
 #include "include/dl.h"
 #include "include/token.h"
 #include <string.h>
@@ -51,6 +52,20 @@ runtime_T* init_runtime()
     runtime->scope = init_hermes_scope();
     runtime->references = init_dynamic_list(sizeof(struct RUNTIME_REFERENCE_STRUCT));
     runtime->list_methods = init_dynamic_list(sizeof(struct AST_STRUCT*));
+
+    // GLOBAL FUNCTIONS
+
+    AST_T* PRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    PRINT_FUNCTION_DEFINITION->function_name = "print";
+    PRINT_FUNCTION_DEFINITION->fptr = hermes_builtin_function_print;
+    dynamic_list_append(runtime->scope->function_definitions, PRINT_FUNCTION_DEFINITION);
+
+    AST_T* PPRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    PPRINT_FUNCTION_DEFINITION->function_name = "pprint";
+    PPRINT_FUNCTION_DEFINITION->fptr = hermes_builtin_function_pprint;
+    dynamic_list_append(runtime->scope->function_definitions, PPRINT_FUNCTION_DEFINITION);
+
+    // LIST FUNCTIONS
 
     AST_T* LIST_ADD_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
     LIST_ADD_FUNCTION_DEFINITION->function_name = "add";
@@ -544,46 +559,9 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
 {    
     hermes_scope_T* scope = get_scope(runtime, node);
 
-    // TODO: remove this `if` and make a more beautiful implementation of
-    // built-in methods.
-    if (strcmp(node->function_call_name, "print") == 0)
-    {
-        for (int x = 0; x < node->function_call_arguments->size; x++)
-        {
-            AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
-            AST_T* visited = runtime_visit(runtime, ast_arg);
-
-            switch (visited->type)
-            {
-                case AST_NULL: printf("NULL\n"); break;
-                case AST_STRING: printf("%s\n", visited->string_value); break;
-                case AST_CHAR: printf("%c\n", visited->char_value); break;
-                case AST_INTEGER: printf("%d\n", visited->int_value); break;
-                case AST_FLOAT: printf("%0.6f\n", visited->float_value); break;
-                case AST_BOOLEAN: printf("%d\n", visited->boolean_value); break;
-                case AST_OBJECT: printf("{ object }\n"); break;
-                case AST_LIST: printf("[ list ]\n"); break;
-            }
-        }
-
-        return init_ast(AST_NOOP);
-    }
-
-    // TODO: remove this `if` and make a more beautiful implementation of
-    // built-in methods.
-    if (strcmp(node->function_call_name, "pprint") == 0)
-    {
-        for (int x = 0; x < node->function_call_arguments->size; x++)
-        {
-            AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
-            AST_T* visited = runtime_visit(runtime, ast_arg);
-
-            printf("%p\n", visited);
-        }
-
-        return init_ast(AST_NOOP);
-    }
-
+    // TODO: put this in the hermes_builtins.c,
+    // this cannot be done right now because the function pointers does not
+    // support the `scope` argument.
     if (strcmp(node->function_call_name, "dload") == 0)
     {
         AST_T* ast_arg_0 = (AST_T*) node->function_call_arguments->items[0];
