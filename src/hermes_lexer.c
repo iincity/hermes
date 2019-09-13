@@ -197,6 +197,7 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             case '.': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_DOT); break;
             case '<': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_LESS_THAN); break;
             case '>': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_LARGER_THAN); break;
+            case '\0': return init_token(TOKEN_EOF, "\0"); break;
             default: printf("[Line %d] Unexpected %c\n", hermes_lexer->line_n, hermes_lexer->current_char); exit(1); break;
         }
     }
@@ -233,6 +234,10 @@ void hermes_lexer_advance(hermes_lexer_T* hermes_lexer)
     {
         hermes_lexer->char_index += 1;
         hermes_lexer->current_char = hermes_lexer->contents[hermes_lexer->char_index];
+    }
+    else
+    {
+        hermes_lexer->current_char = '\0';
     }
 }
 

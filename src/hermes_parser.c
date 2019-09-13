@@ -310,7 +310,10 @@ AST_T* hermes_parser_parse_object(hermes_parser_T* hermes_parser, hermes_scope_T
     ast_object->scope = (struct hermes_scope_T*) scope;
     ast_object->object_children = init_dynamic_list(sizeof(struct AST_STRUCT));
     hermes_scope_T* new_scope = init_hermes_scope();
-    new_scope->owner = scope->owner;
+
+    if (scope)
+        if (scope->owner)
+            new_scope->owner = scope->owner;
 
     hermes_parser_eat(hermes_parser, TOKEN_LBRACE);
 
