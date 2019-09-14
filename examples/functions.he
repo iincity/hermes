@@ -12,7 +12,3 @@ bool is_dead()
 {
     return false;
 };
-
-print(get_name());
-print(get_age());
-print(is_dead());
