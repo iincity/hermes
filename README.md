@@ -43,6 +43,7 @@ print(response)
 * string
 * object
 * ref
+* source
 
 ### List example
 ```
@@ -111,6 +112,22 @@ ref something;
 
 something.x += 1;
 ```
+
+### Source example
+> Sources are basically objects that represents a parsed source code.
+```C
+source s = include("examples/functions.he");
+```
+> To have hermes interpret the source, simply use the built-in `visit` method:
+```C
+visit(s);
+```
+> Now you can also dump that source to a serialized `.dat` file using the built-in `ddisk` method:
+```C
+ddisk(s, "functions");
+```
+> This will create a `functions.dat` file.
+> To read the use case for these `.dat` files, please [DAT.md](read this).
 
 ## Available statements
 * new
