@@ -9,5 +9,7 @@ AST_T* hermes_builtin_function_pprint(AST_T* self, dynamic_list_T* args);
 
 AST_T* hermes_builtin_function_include(AST_T* self, dynamic_list_T* args);
 
+AST_T* hermes_builtin_function_ddisk(AST_T* self, dynamic_list_T* args);
+
 AST_T* INITIALIZED_NOOP;
 #endif

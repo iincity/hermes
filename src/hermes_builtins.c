@@ -3,6 +3,7 @@
 #include "include/hermes_lexer.h"
 #include "include/hermes_parser.h"
 #include "include/io.h"
+#include <string.h>
 
 /**
  * Simple print implementation.
@@ -74,4 +75,55 @@ AST_T* hermes_builtin_function_include(AST_T* self, dynamic_list_T* args)
     hermes_lexer_free(lexer);
 
     return node;
+}
+
+/**
+ * Builtin method to dump an AST node to disk, serialized.
+ *
+ * @param AST_T* self
+ * @param dynamic_list_T* args
+ *
+ * @return AST_T*
+ */
+AST_T* hermes_builtin_function_ddisk(AST_T* self, dynamic_list_T* args)
+{
+    runtime_expect_args(args, 2, (int[]) {AST_COMPOUND, AST_STRING});
+
+    AST_T* ast_compound = (AST_T*) args->items[0];
+    AST_T* ast_string = (AST_T*) args->items[1];
+    
+    char* filename = ast_string->string_value;
+
+    FILE *outfile;
+
+    const char* filename_template = "%s.dat";
+    char* fname = calloc(strlen(filename) + strlen(filename_template) + 1, sizeof(char));
+    sprintf(fname, filename_template, filename);
+      
+    outfile = fopen(fname, "w");
+
+    if (outfile == NULL) 
+    { 
+        fprintf(stderr, "Could not open %s\n", fname);
+        free(fname); 
+        exit(1); 
+    } 
+  
+    // write struct to file 
+    fwrite (&ast_compound, sizeof(struct AST_STRUCT), 1, outfile);
+      
+    if(fwrite != 0)
+    {
+        // silence
+    }
+    else
+    {
+        printf("Could not write to %s\n", fname);
+    }
+    
+    free(fname); 
+  
+    fclose(outfile); 
+  
+    return ast_compound;
 }

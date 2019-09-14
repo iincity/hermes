@@ -62,6 +62,11 @@ runtime_T* init_runtime()
     INCLUDE_FUNCTION_DEFINITION->fptr = hermes_builtin_function_include;
     dynamic_list_append(runtime->scope->function_definitions, INCLUDE_FUNCTION_DEFINITION);
 
+    AST_T* DDISK_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    DDISK_FUNCTION_DEFINITION->function_name = "ddisk";
+    DDISK_FUNCTION_DEFINITION->fptr = hermes_builtin_function_ddisk;
+    dynamic_list_append(runtime->scope->function_definitions, DDISK_FUNCTION_DEFINITION);
+
     AST_T* PRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
     PRINT_FUNCTION_DEFINITION->function_name = "print";
     PRINT_FUNCTION_DEFINITION->fptr = hermes_builtin_function_print;
