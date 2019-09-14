@@ -127,7 +127,7 @@ visit(s);
 ddisk(s, "functions");
 ```
 > This will create a `functions.dat` file.
-> To read the use case for these `.dat` files, please [DAT.md](read this).
+> To read the use case for these `.dat` files, please [read this](DAT.md).
 
 ## Available statements
 * new
