@@ -56,6 +56,11 @@ runtime_T* init_runtime()
     INITIALIZED_NOOP = init_ast(AST_NOOP);
 
     // GLOBAL FUNCTIONS
+    
+    AST_T* INCLUDE_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    INCLUDE_FUNCTION_DEFINITION->function_name = "include";
+    INCLUDE_FUNCTION_DEFINITION->fptr = hermes_builtin_function_include;
+    dynamic_list_append(runtime->scope->function_definitions, INCLUDE_FUNCTION_DEFINITION);
 
     AST_T* PRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
     PRINT_FUNCTION_DEFINITION->function_name = "print";
@@ -65,7 +70,7 @@ runtime_T* init_runtime()
     AST_T* PPRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
     PPRINT_FUNCTION_DEFINITION->function_name = "pprint";
     PPRINT_FUNCTION_DEFINITION->fptr = hermes_builtin_function_pprint;
-    dynamic_list_append(runtime->scope->function_definitions, PPRINT_FUNCTION_DEFINITION);
+    dynamic_list_append(runtime->scope->function_definitions, PPRINT_FUNCTION_DEFINITION); 
 
     // LIST FUNCTIONS
 
@@ -578,7 +583,17 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
         runtime_visit(runtime, fdef);
 
         return fdef;
-    } 
+    }
+
+    if (strcmp(node->function_call_name, "visit") == 0)
+    {
+        AST_T* arg = (void*)0;
+
+        for (int i = 0; i < node->function_call_arguments->size; i++)
+            arg = runtime_visit(runtime, (AST_T*) node->function_call_arguments->items[i]);
+
+        return arg;
+    }  
 
     if (node->scope != (void*) 0)
     {

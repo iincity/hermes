@@ -1,0 +1,5 @@
+source s = include("examples/functions.he");
+source v = visit(s);
+
+pprint(v);
+print(get_name());

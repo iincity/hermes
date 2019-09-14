@@ -11,6 +11,7 @@ const char* DATA_TYPE_BOOLEAN = "bool";
 const char* DATA_TYPE_OBJECT = "object";
 const char* DATA_TYPE_REFERENCE = "ref";
 const char* DATA_TYPE_LIST = "list";
+const char* DATA_TYPE_SOURCE = "source";
 
 const char* STATEMENT_WHILE = "while";
 const char* STATEMENT_IF = "if";
@@ -101,6 +102,7 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
                 strcmp(token_value, DATA_TYPE_BOOLEAN) == 0 ||
                 strcmp(token_value, DATA_TYPE_OBJECT) == 0 ||
                 strcmp(token_value, DATA_TYPE_LIST) == 0 ||
+                strcmp(token_value, DATA_TYPE_SOURCE) == 0 ||
                 strcmp(token_value, DATA_TYPE_REFERENCE) == 0
             )
                 return hermes_parser_parse_function_definition(hermes_parser, scope);
@@ -444,6 +446,7 @@ AST_T* hermes_parser_parse_term(hermes_parser_T* hermes_parser, hermes_scope_T* 
         strcmp(token_value, DATA_TYPE_BOOLEAN) == 0 ||
         strcmp(token_value, DATA_TYPE_OBJECT) == 0 ||
         strcmp(token_value, DATA_TYPE_LIST) == 0 ||
+        strcmp(token_value, DATA_TYPE_SOURCE) == 0 ||
         strcmp(token_value, DATA_TYPE_REFERENCE) == 0
     ) // this is to be able to have variable definitions inside of function definition parantheses.
         return hermes_parser_parse_function_definition(hermes_parser, scope);
@@ -671,6 +674,7 @@ AST_T* hermes_parser_parse_function_definition(hermes_parser_T* hermes_parser, h
                 case AST_BOOLEAN: if (strcmp(ast_type->type_value, DATA_TYPE_BOOLEAN) != 0) hermes_parser_type_error(hermes_parser); break;
                 case AST_LIST: if (strcmp(ast_type->type_value, DATA_TYPE_LIST) != 0) hermes_parser_type_error(hermes_parser); break;
                 case AST_CHAR: if (strcmp(ast_type->type_value, DATA_TYPE_CHAR) != 0) hermes_parser_type_error(hermes_parser); break;
+                case AST_COMPOUND: if (strcmp(ast_type->type_value, DATA_TYPE_SOURCE) != 0) hermes_parser_type_error(hermes_parser); break;
             }
         }
 

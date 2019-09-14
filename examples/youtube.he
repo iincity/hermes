@@ -1,0 +1,18 @@
+object Person(string name)
+{
+    object o = {
+        string name;    
+    };
+
+    o.name = name;
+
+    return new o;
+}
+
+
+object my_person = Person("John doe");
+object my_person2 = Person("Sarah");
+
+
+print(my_person.name);
+print(my_person2.name);
