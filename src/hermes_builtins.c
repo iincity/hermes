@@ -21,7 +21,7 @@ AST_T* hermes_builtin_function_print(AST_T* self, dynamic_list_T* args)
 
         switch (ast_arg->type)
         {
-            case AST_NULL: printf("NULL\n"); break;
+            case AST_NULL: case AST_NOOP: printf("NULL\n"); break;
             case AST_STRING: printf("%s\n", ast_arg->string_value); break;
             case AST_CHAR: printf("%c\n", ast_arg->char_value); break;
             case AST_INTEGER: printf("%d\n", ast_arg->int_value); break;

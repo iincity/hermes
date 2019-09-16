@@ -14,6 +14,8 @@ AST_T* init_ast(int type)
     AST->object_children = (void*) 0;
     AST->saved_function_call = (void*) 0;
     AST->function_definitions = (void*) 0;
+    AST->function_definition_body = (void*) 0;
+    AST->composition_children = (void*) 0;
     AST->is_object_child = 0;
     AST->new_value = (void*) 0;
 

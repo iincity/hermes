@@ -535,37 +535,86 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
                 return runtime_visit(runtime, (AST_T*) function_definition->fptr((AST_T*) function_definition, visited_fptr_args));
             }
 
-            hermes_scope_T* function_definition_body_scope = (hermes_scope_T*) function_definition->function_definition_body->scope; 
-
-            // Clear all existing arguments to prepare for the new definitions
-            for (int i = function_definition_body_scope->variable_definitions->size; i > 0; i--)
-                dynamic_list_remove(
-                    function_definition_body_scope->variable_definitions,
-                    function_definition_body_scope->variable_definitions->items[i],
-                    (void*)0
-                );
-
-            for (int x = 0; x < node->function_call_arguments->size; x++)
+            if (function_definition->function_definition_body != (void*)0)
             {
-                AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
+                hermes_scope_T* function_definition_body_scope = (hermes_scope_T*) function_definition->function_definition_body->scope; 
 
-                if (x > function_definition->function_definition_arguments->size - 1)
+                // Clear all existing arguments to prepare for the new definitions
+                for (int i = function_definition_body_scope->variable_definitions->size; i > 0; i--)
+                    dynamic_list_remove(
+                        function_definition_body_scope->variable_definitions,
+                        function_definition_body_scope->variable_definitions->items[i],
+                        (void*)0
+                    );
+
+                for (int x = 0; x < node->function_call_arguments->size; x++)
                 {
-                    printf("Too many arguments\n");
-                    break;
+                    AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
+
+                    if (x > function_definition->function_definition_arguments->size - 1)
+                    {
+                        printf("Too many arguments\n");
+                        break;
+                    }
+
+                    AST_T* ast_fdef_arg = (AST_T*) function_definition->function_definition_arguments->items[x];
+                    char* arg_name = ast_fdef_arg->variable_name;
+
+                    AST_T* new_variable_def = init_ast(AST_VARIABLE_DEFINITION);
+                    new_variable_def->variable_value = runtime_visit(runtime, ast_arg);
+                    new_variable_def->variable_name = arg_name;
+
+                    dynamic_list_append(function_definition_body_scope->variable_definitions, new_variable_def);
                 }
 
-                AST_T* ast_fdef_arg = (AST_T*) function_definition->function_definition_arguments->items[x];
-                char* arg_name = ast_fdef_arg->variable_name;
-
-                AST_T* new_variable_def = init_ast(AST_VARIABLE_DEFINITION);
-                new_variable_def->variable_value = runtime_visit(runtime, ast_arg);
-                new_variable_def->variable_name = arg_name;
-
-                dynamic_list_append(function_definition_body_scope->variable_definitions, new_variable_def);
+                return runtime_visit(runtime, function_definition->function_definition_body);
             }
+            else
+            if (function_definition->composition_children != (void*)0)
+            {
+                AST_T* final_result = init_ast(AST_NULL);
+                char* type_value = function_definition->function_definition_type->type_value;
 
-            return runtime_visit(runtime, function_definition->function_definition_body);
+                if (strcmp(type_value, "int") == 0)
+                {
+                    final_result->type = AST_INTEGER;
+                    final_result->int_value = 0;
+                }
+                else
+                if (strcmp(type_value, "float") == 0)
+                {
+                    final_result->type = AST_FLOAT;
+                    final_result->float_value = 0.0f;
+                }
+                else
+                if (strcmp(type_value, "string") == 0)
+                {
+                    final_result->type = AST_STRING;
+                    final_result->string_value = calloc(1, sizeof(char));
+                    final_result->string_value[0] = '\0';
+                }
+
+                for (int i = 0; i < function_definition->composition_children->size; i++)
+                {
+                    AST_T* comp_child = (AST_T*) function_definition->composition_children->items[i];
+                    AST_T* fcall = init_ast(AST_FUNCTION_CALL);
+                    fcall->function_call_name = comp_child->variable_name;
+                    fcall->function_call_arguments = node->function_call_arguments;
+
+                    AST_T* result = runtime_function_lookup(runtime, scope, fcall);
+
+                    switch (result->type)
+                    {
+                        case AST_INTEGER: final_result->int_value += result->int_value; break;
+                        case AST_FLOAT: final_result->float_value += result->float_value; break;
+                        case AST_STRING: final_result->string_value = realloc(final_result->string_value, (strlen(result->string_value) + strlen(final_result->string_value) + 1) * sizeof(char)); strcat(final_result->string_value, result->string_value); break;
+                    }
+
+                    free(result);
+                }
+
+                return final_result;
+            }
         }
     }
 

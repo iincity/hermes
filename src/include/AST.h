@@ -58,6 +58,7 @@ typedef struct AST_STRUCT
     dynamic_list_T* object_children;
     dynamic_list_T* list_children;
     dynamic_list_T* function_definitions;
+    dynamic_list_T* composition_children;
     struct AST_STRUCT* function_definition_body;
     struct AST_STRUCT* function_definition_type;
     struct AST_STRUCT* if_expr;
