@@ -122,9 +122,9 @@ source s = include("examples/functions.he");
 ```C
 visit(s);
 ```
-> Now you can also dump that source to a serialized `.dat` file using the built-in `ddisk` method:
+> Now you can also dump that source to a serialized `.dat` file using the built-in `wad` method:
 ```C
-ddisk(s, "functions");
+wad(s, "functions");
 ```
 > This will create a `functions.dat` file.
 > To read the use case for these `.dat` files, please [read this](DAT.md).

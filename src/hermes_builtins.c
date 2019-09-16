@@ -85,7 +85,7 @@ AST_T* hermes_builtin_function_include(AST_T* self, dynamic_list_T* args)
  *
  * @return AST_T*
  */
-AST_T* hermes_builtin_function_ddisk(AST_T* self, dynamic_list_T* args)
+AST_T* hermes_builtin_function_wad(AST_T* self, dynamic_list_T* args)
 {
     runtime_expect_args(args, 2, (int[]) {AST_COMPOUND, AST_STRING});
 
@@ -110,7 +110,7 @@ AST_T* hermes_builtin_function_ddisk(AST_T* self, dynamic_list_T* args)
     } 
   
     // write struct to file 
-    fwrite (&ast_compound, sizeof(struct AST_STRUCT), 1, outfile);
+    fwrite (&*ast_compound, sizeof(struct AST_STRUCT), 1, outfile);
       
     if(fwrite != 0)
     {
@@ -126,4 +126,47 @@ AST_T* hermes_builtin_function_ddisk(AST_T* self, dynamic_list_T* args)
     fclose(outfile); 
   
     return ast_compound;
+}
+
+/**
+ * Built-in function to load a compound AST from disk
+ *
+ * @param AST_T* self
+ * @param dynamic_list_T* args
+ *
+ * @return AST_T*
+ */
+AST_T* hermes_builtin_function_lad(AST_T* self, dynamic_list_T* args)
+{
+    runtime_expect_args(args, 1, (int[]) {AST_STRING});
+    
+    AST_T* ast_string = (AST_T*) args->items[0];
+
+    char* filename = ast_string->string_value;
+
+    const char* filename_template = "%s.dat";
+    char* fname = calloc(strlen(filename) + strlen(filename_template) + 1, sizeof(char));
+    sprintf(fname, filename_template, filename);
+
+    FILE *infile; 
+    struct AST_STRUCT input; 
+      
+    infile = fopen(fname, "r"); 
+    if (infile == NULL) 
+    { 
+        fprintf(stderr, "Error reading %s\n", fname); 
+        free(fname);
+        exit(1); 
+    } 
+      
+    // read file contents till end of file 
+    while(fread(&input, sizeof(struct AST_STRUCT), 1, infile)) 
+        printf("...\n");
+  
+    // close file 
+    fclose (infile);
+
+    AST_T* loaded = &input;
+
+    return loaded;
 }
