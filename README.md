@@ -202,21 +202,22 @@ object person = new get_person("Hanna");
 ## Compositions
 > Hermes now also support compositions, like this:
 ```
-int add(int x, int y)
+int add_2(int x)
 {
-    return x + y;
+    return x + 2;
 }
 
-int multiply(int x, int y)
+int remove_1(int x)
 {
-    return x * y;
+    return x - 1;
 }
 
-int mycomp(int x, int y) =
-    add,
-    multiply;
+int mycomp(int x) =
+    add_2, remove_1;
 
-int myvalue = mycomp(16, 32);
+int x = mycomp(10);
+
+print(x);
 ```
 
 ## Notes

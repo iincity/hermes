@@ -1,15 +1,16 @@
-int add(int x, int y)
+int add_2(int x)
 {
-    return x + y;
+    return x + 2;
 }
 
-int multiply(int x, int y)
+int remove_1(int x)
 {
-    return x * y;
+    return x - 1;
 }
 
-int mycomp(int x, int y) = add, multiply;
+int mycomp(int x) =
+    add_2, remove_1;
 
-int x = mycomp(10, 13);
+int x = mycomp(10);
 
 print(x);

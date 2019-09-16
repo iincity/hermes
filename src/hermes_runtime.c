@@ -594,24 +594,34 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
                     final_result->string_value[0] = '\0';
                 }
 
+                dynamic_list_T* call_arguments = init_dynamic_list(sizeof(struct AST_STRUCT*));
+                dynamic_list_append(call_arguments, final_result);
+
                 for (int i = 0; i < function_definition->composition_children->size; i++)
                 {
                     AST_T* comp_child = (AST_T*) function_definition->composition_children->items[i];
                     AST_T* fcall = init_ast(AST_FUNCTION_CALL);
                     fcall->function_call_name = comp_child->variable_name;
-                    fcall->function_call_arguments = node->function_call_arguments;
+
+                    if (i == 0)
+                        fcall->function_call_arguments = node->function_call_arguments;
+                    else
+                        fcall->function_call_arguments = call_arguments;
 
                     AST_T* result = runtime_function_lookup(runtime, scope, fcall);
 
                     switch (result->type)
                     {
-                        case AST_INTEGER: final_result->int_value += result->int_value; break;
-                        case AST_FLOAT: final_result->float_value += result->float_value; break;
+                        case AST_INTEGER: final_result->int_value = result->int_value; break;
+                        case AST_FLOAT: final_result->float_value = result->float_value; break;
                         case AST_STRING: final_result->string_value = realloc(final_result->string_value, (strlen(result->string_value) + strlen(final_result->string_value) + 1) * sizeof(char)); strcat(final_result->string_value, result->string_value); break;
                     }
 
                     free(result);
                 }
+
+                free(call_arguments->items);
+                free(call_arguments);
 
                 return final_result;
             }
