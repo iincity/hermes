@@ -129,6 +129,55 @@ wad(s, "functions");
 > This will create a `functions.dat` file.
 > To read the use case for these `.dat` files, please [read this](DAT.md).
 
+## Built-in methods
+* print
+* pprint
+* include
+* wad
+* lad
+* visit
+
+### print
+> Prints what ever you gives it, example:
+```
+print("hello world");
+```
+
+### pprint
+> Prints the adress of a value, example:
+```
+object person = {string name = "John Doe";};
+
+pprint(person);
+```
+
+### include
+> Loads an external source file, example:
+```
+source s = include("examples/functions.he");
+```
+
+### wad
+> Writes an AST compound to disk, example:
+```
+source s = include("examples/functions.he");
+wad(s, "functions");
+```
+> This creates a `functions.dat` file.
+
+### lad
+> Loads an AST compound from disk, example:
+```
+source s = lad("functions");
+```
+
+### visit
+> Visits and executes a source, example:
+```
+source s = include("examples/functions.he");
+visit(s);
+```
+
 ## Available statements
 * new
 
