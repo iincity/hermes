@@ -199,6 +199,26 @@ object person = new get_person("Hanna");
 > The `new` statement will always return a new address of whatever is to the
 > right of the statement.
 
+## Compositions
+> Hermes now also support compositions, like this:
+```
+int add(int x, int y)
+{
+    return x + y;
+}
+
+int multiply(int x, int y)
+{
+    return x * y;
+}
+
+int mycomp(int x, int y) =
+    add,
+    multiply;
+
+int myvalue = mycomp(16, 32);
+```
+
 ## Notes
 ### For loops
 > For loops does not exist, you can acheive the same thing with while loops and we are trying to keep the language simple.
