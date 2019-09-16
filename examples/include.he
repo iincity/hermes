@@ -1,8 +1,5 @@
 source s = include("examples/functions.he");
 source v = visit(s);
 
-pprint(v);
-
-ddisk(v, "functions");
 
 print(get_name());
