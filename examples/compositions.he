@@ -1,0 +1,15 @@
+int add(int x, int y)
+{
+    return x + y;
+}
+
+int multiply(int x, int y)
+{
+    return x * y;
+}
+
+int mycomp(int x, int y) = add, multiply;
+
+int x = mycomp(10, 13);
+
+print(x);
