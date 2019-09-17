@@ -2,3 +2,5 @@ object file = fopen("examples/functions.he", "r");
 string x = file.read();
 
 print(x);
+
+fclose(file);

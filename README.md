@@ -138,6 +138,7 @@ wad(s, "functions");
 * visit
 * fopen
 * fputs
+* fclose
 
 ### print
 > Prints what ever you gives it, example:
@@ -187,6 +188,7 @@ object file = fopen("examples/functions.he", "r");
 string x = file.read();
 
 print(x);
+fclose(file);
 ```
 
 ### fputs
@@ -195,6 +197,14 @@ print(x);
 object file = fopen("myfile.txt", "w+");
 
 fputs("hello world", file);
+fclose(file);
+```
+
+### fclose
+> Close file, example:
+```C
+object file = fopen("myfile.txt", "w+");
+fclose(file);
 ```
 
 ## Available statements

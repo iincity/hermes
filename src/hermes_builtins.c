@@ -187,8 +187,6 @@ static AST_T* object_file_function_read(AST_T* self, dynamic_list_T* args)
 
         if (buffer)
             fread (buffer, 1, length, f);
-
-        fclose (f);
     }
 
     AST_T* ast_string = init_ast(AST_STRING);
@@ -230,6 +228,26 @@ AST_T* hermes_builtin_function_fopen(AST_T* self, dynamic_list_T* args)
 }
 
 /**
+ * Built-in function to close file.
+ *
+ * @param AST_T* self
+ * @param dynamic_list_T* args
+ *
+ * @return AST_T*
+ */
+AST_T* hermes_builtin_function_fclose(AST_T* self, dynamic_list_T* args)
+{
+    runtime_expect_args(args, 1, (int[]) {AST_OBJECT});
+
+    AST_T* return_ast = init_ast(AST_INTEGER);
+    FILE* f = (FILE*) ((AST_T*)args->items[0])->object_value;
+    return_ast->int_value = 1;
+    fclose(f);
+
+    return return_ast;
+}
+
+/**
  * Built-in function to write string to file.
  *
  * @param AST_T* self
@@ -248,7 +266,6 @@ AST_T* hermes_builtin_function_fputs(AST_T* self, dynamic_list_T* args)
     FILE* f = (FILE*) ((AST_T*)args->items[1])->object_value;
 
     fputs(line, f);
-    fclose(f);
 
     return return_ast;
 }
