@@ -170,3 +170,61 @@ AST_T* hermes_builtin_function_lad(AST_T* self, dynamic_list_T* args)
 
     return loaded;
 }
+
+static AST_T* object_file_function_read(AST_T* self, dynamic_list_T* args)
+{
+    FILE* f = self->object_value;
+
+    char* buffer = 0;
+    long length;
+
+    if (f)
+    {
+        fseek (f, 0, SEEK_END);
+        length = ftell (f);
+        fseek (f, 0, SEEK_SET);
+        buffer = calloc (length, length);
+
+        if (buffer)
+            fread (buffer, 1, length, f);
+
+        fclose (f);
+    }
+
+    AST_T* ast_string = init_ast(AST_STRING);
+    ast_string->string_value = buffer;
+
+    return ast_string;
+}
+
+/**
+ * Built-in function to open file.
+ *
+ * @param AST_T* self
+ * @param dynamic_list_T* args
+ *
+ * @return AST_T*
+ */
+AST_T* hermes_builtin_function_fopen(AST_T* self, dynamic_list_T* args)
+{
+    runtime_expect_args(args, 2, (int[]) {AST_STRING, AST_STRING});
+
+    char* filename = ((AST_T*)args->items[0])->string_value;
+    char* mode = ((AST_T*)args->items[1])->string_value;
+
+    FILE* f = fopen(filename, mode);
+
+    AST_T* ast_obj = init_ast(AST_OBJECT);
+    ast_obj->variable_type = init_ast(AST_TYPE);
+    ast_obj->variable_type->type_value = "file";
+    ast_obj->object_value = f;
+
+    AST_T* fdef_read = init_ast(AST_FUNCTION_DEFINITION);
+    fdef_read->function_name = "read";
+    fdef_read->fptr = object_file_function_read;
+
+    ast_obj->function_definitions = init_dynamic_list(sizeof(struct AST_STRUCT*));
+    dynamic_list_append(ast_obj->function_definitions, fdef_read);
+
+    return ast_obj;
+}

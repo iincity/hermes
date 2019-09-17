@@ -54,8 +54,8 @@ list colors = [
 ];
 ```
 
-### Built-in list methods
-#### Add
+#### Built-in list methods
+##### Add
 > To add an item to a list:
 ```C
 list names = [];
@@ -136,6 +136,7 @@ wad(s, "functions");
 * wad
 * lad
 * visit
+* fopen
 
 ### print
 > Prints what ever you gives it, example:
@@ -178,6 +179,15 @@ source s = include("examples/functions.he");
 visit(s);
 ```
 
+### fopen
+> Open a file, here is an example to read the contents of a file:
+```C
+object file = fopen("examples/functions.he", "r");
+string x = file.read();
+
+print(x);
+```
+
 ## Available statements
 * new
 
@@ -201,7 +211,7 @@ object person = new get_person("Hanna");
 
 ## Compositions
 > Hermes now also support compositions, like this:
-```
+```C
 int add_2(int x)
 {
     return x + 2;

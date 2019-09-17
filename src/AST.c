@@ -17,6 +17,7 @@ AST_T* init_ast(int type)
     AST->function_definition_body = (void*) 0;
     AST->composition_children = (void*) 0;
     AST->is_object_child = 0;
+    AST->object_value = (void*)0;
     AST->new_value = (void*) 0;
 
     if (type == AST_LIST)
