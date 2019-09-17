@@ -87,6 +87,11 @@ runtime_T* init_runtime()
     FOPEN_FUNCTION_DEFINITION->fptr = hermes_builtin_function_fopen;
     dynamic_list_append(runtime->scope->function_definitions, FOPEN_FUNCTION_DEFINITION);
 
+    AST_T* FPUTS_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    FPUTS_FUNCTION_DEFINITION->function_name = "fputs";
+    FPUTS_FUNCTION_DEFINITION->fptr = hermes_builtin_function_fputs;
+    dynamic_list_append(runtime->scope->function_definitions, FPUTS_FUNCTION_DEFINITION);
+
     // LIST FUNCTIONS
 
     AST_T* LIST_ADD_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);

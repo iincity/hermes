@@ -228,3 +228,27 @@ AST_T* hermes_builtin_function_fopen(AST_T* self, dynamic_list_T* args)
 
     return ast_obj;
 }
+
+/**
+ * Built-in function to write string to file.
+ *
+ * @param AST_T* self
+ * @param dynamic_list_T* args
+ *
+ * @return AST_T*
+ */
+AST_T* hermes_builtin_function_fputs(AST_T* self, dynamic_list_T* args)
+{
+    runtime_expect_args(args, 2, (int[]) {AST_STRING, AST_OBJECT});
+
+    AST_T* return_ast = init_ast(AST_INTEGER);
+    return_ast->int_value = 1;
+
+    char* line = ((AST_T*)args->items[0])->string_value;
+    FILE* f = (FILE*) ((AST_T*)args->items[1])->object_value;
+
+    fputs(line, f);
+    fclose(f);
+
+    return return_ast;
+}

@@ -1,0 +1,3 @@
+object file = fopen("myfile.txt", "w+");
+
+fputs("hello world", file);
