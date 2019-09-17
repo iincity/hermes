@@ -182,16 +182,25 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
 
         if (hermes_lexer->current_char == '/')
         {
-            hermes_lexer_advance(hermes_lexer);
-
-            if (hermes_lexer->current_char != '/')
-                return init_token(TOKEN_DIV, "/");
+            hermes_lexer_advance(hermes_lexer); 
 
             if (hermes_lexer->current_char == '/')
             {
                 hermes_lexer_advance(hermes_lexer);
                 hermes_lexer_skip_inline_comment(hermes_lexer);
                 continue;
+            }
+            else
+            if (hermes_lexer->current_char == '*')
+            {
+                hermes_lexer_advance(hermes_lexer);
+                hermes_lexer_skip_block_comment(hermes_lexer);
+                continue;
+            }
+            else
+            if (hermes_lexer->current_char != '/')
+            {
+                return init_token(TOKEN_DIV, "/");
             }
         }
 
@@ -281,10 +290,39 @@ void hermes_lexer_skip_whitespace(hermes_lexer_T* hermes_lexer)
         hermes_lexer_advance(hermes_lexer);
 }
 
+/**
+ * Skip an inline comment
+ *
+ * @param hermes_lexer_T* hermes_lexer
+ */
 void hermes_lexer_skip_inline_comment(hermes_lexer_T* hermes_lexer)
 {
     while (hermes_lexer->current_char != '\n' && hermes_lexer->current_char != 10)
         hermes_lexer_advance(hermes_lexer);
+}
+
+/**
+ * Skip a block comment
+ *
+ * @param hermes_lexer_T* hermes_lexer
+ */
+void hermes_lexer_skip_block_comment(hermes_lexer_T* hermes_lexer)
+{
+    while (1)
+    {
+        hermes_lexer_advance(hermes_lexer);
+
+        if (hermes_lexer->current_char == '*')
+        {
+            hermes_lexer_advance(hermes_lexer);
+
+            if (hermes_lexer->current_char == '/')
+            {
+                hermes_lexer_advance(hermes_lexer);
+                return;
+            }
+        }
+    }
 }
 
 /**
