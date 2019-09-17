@@ -141,13 +141,13 @@ wad(s, "functions");
 
 ### print
 > Prints what ever you gives it, example:
-```
+```C
 print("hello world");
 ```
 
 ### pprint
 > Prints the adress of a value, example:
-```
+```C
 object person = {string name = "John Doe";};
 
 pprint(person);
@@ -155,13 +155,13 @@ pprint(person);
 
 ### include
 > Loads an external source file, example:
-```
+```C
 source s = include("examples/functions.he");
 ```
 
 ### wad
 > Writes an AST compound to disk, example:
-```
+```C
 source s = include("examples/functions.he");
 wad(s, "functions");
 ```
@@ -169,13 +169,13 @@ wad(s, "functions");
 
 ### lad
 > Loads an AST compound from disk, example:
-```
+```C
 source s = lad("functions");
 ```
 
 ### visit
 > Visits and executes a source, example:
-```
+```C
 source s = include("examples/functions.he");
 visit(s);
 ```
