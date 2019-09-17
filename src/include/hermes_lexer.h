@@ -25,6 +25,8 @@ void hermes_lexer_expect_char(hermes_lexer_T* hermes_lexer, char c);
 
 void hermes_lexer_skip_whitespace(hermes_lexer_T* hermes_lexer);
 
+void hermes_lexer_skip_inline_comment(hermes_lexer_T* hermes_lexer);
+
 token_T* hermes_lexer_collect_string(hermes_lexer_T* hermes_lexer);
 
 token_T* hermes_lexer_collect_char(hermes_lexer_T* hermes_lexer);

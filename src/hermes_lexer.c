@@ -180,6 +180,21 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             return init_token(TOKEN_NOT, value);
         }
 
+        if (hermes_lexer->current_char == '/')
+        {
+            hermes_lexer_advance(hermes_lexer);
+
+            if (hermes_lexer->current_char != '/')
+                return init_token(TOKEN_DIV, "/");
+
+            if (hermes_lexer->current_char == '/')
+            {
+                hermes_lexer_advance(hermes_lexer);
+                hermes_lexer_skip_inline_comment(hermes_lexer);
+                continue;
+            }
+        }
+
         switch(hermes_lexer->current_char)
         {
             case '"': return hermes_lexer_collect_string(hermes_lexer); break;
@@ -192,7 +207,6 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
             case ')': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_RPAREN); break;
             case ';': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_SEMI); break;
             case ',': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_COMMA); break;
-            case '/': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_DIV); break;
             case '%': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_PERCENTAGE); break;
             case '.': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_DOT); break;
             case '<': return hermes_lexer_advance_with_token(hermes_lexer, TOKEN_LESS_THAN); break;
@@ -264,6 +278,12 @@ void hermes_lexer_expect_char(hermes_lexer_T* hermes_lexer, char c)
 void hermes_lexer_skip_whitespace(hermes_lexer_T* hermes_lexer)
 {
     while (hermes_lexer->current_char == ' ' || (int) hermes_lexer->current_char == 10 || (int) hermes_lexer->current_char == 13)
+        hermes_lexer_advance(hermes_lexer);
+}
+
+void hermes_lexer_skip_inline_comment(hermes_lexer_T* hermes_lexer)
+{
+    while (hermes_lexer->current_char != '\n' && hermes_lexer->current_char != 10)
         hermes_lexer_advance(hermes_lexer);
 }
 
