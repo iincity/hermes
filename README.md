@@ -46,7 +46,7 @@ print(response)
 * source
 
 ### List example
-```
+```C
 list colors = [
     "red",
     "green",
@@ -64,7 +64,7 @@ names.add("john");
 ```
 ### Remove
 > To remove an item from a list by index
-```
+```C
 list names = ["john"];
 
 names.remove(0);
