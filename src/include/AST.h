@@ -56,6 +56,7 @@ typedef struct AST_STRUCT
     dynamic_list_T* function_call_arguments;
     dynamic_list_T* function_definition_arguments;
     dynamic_list_T* object_children;
+    void* object_value;
     dynamic_list_T* list_children;
     dynamic_list_T* function_definitions;
     dynamic_list_T* composition_children;

@@ -80,7 +80,22 @@ runtime_T* init_runtime()
     AST_T* PPRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
     PPRINT_FUNCTION_DEFINITION->function_name = "pprint";
     PPRINT_FUNCTION_DEFINITION->fptr = hermes_builtin_function_pprint;
-    dynamic_list_append(runtime->scope->function_definitions, PPRINT_FUNCTION_DEFINITION); 
+    dynamic_list_append(runtime->scope->function_definitions, PPRINT_FUNCTION_DEFINITION);
+
+    AST_T* FOPEN_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    FOPEN_FUNCTION_DEFINITION->function_name = "fopen";
+    FOPEN_FUNCTION_DEFINITION->fptr = hermes_builtin_function_fopen;
+    dynamic_list_append(runtime->scope->function_definitions, FOPEN_FUNCTION_DEFINITION);
+
+    AST_T* FCLOSE_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    FCLOSE_FUNCTION_DEFINITION->function_name = "fclose";
+    FCLOSE_FUNCTION_DEFINITION->fptr = hermes_builtin_function_fclose;
+    dynamic_list_append(runtime->scope->function_definitions, FCLOSE_FUNCTION_DEFINITION);
+
+    AST_T* FPUTS_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
+    FPUTS_FUNCTION_DEFINITION->function_name = "fputs";
+    FPUTS_FUNCTION_DEFINITION->fptr = hermes_builtin_function_fputs;
+    dynamic_list_append(runtime->scope->function_definitions, FPUTS_FUNCTION_DEFINITION);
 
     // LIST FUNCTIONS
 
