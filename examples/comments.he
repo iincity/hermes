@@ -1,0 +1,9 @@
+// printing something
+print("hello"); // comment
+
+/*
+* comment yo
+*/
+print("batman"); /* comment */
+
+print("still alive");
