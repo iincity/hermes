@@ -137,6 +137,7 @@ wad(s, "functions");
 * lad
 * visit
 * fopen
+* fputs
 
 ### print
 > Prints what ever you gives it, example:
@@ -186,6 +187,14 @@ object file = fopen("examples/functions.he", "r");
 string x = file.read();
 
 print(x);
+```
+
+### fputs
+> Write string to file, example:
+```C
+object file = fopen("myfile.txt", "w+");
+
+fputs("hello world", file);
 ```
 
 ## Available statements
