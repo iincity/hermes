@@ -42,4 +42,6 @@ typedef struct TOKEN_STRUCT
 } token_T;
 
 token_T* init_token(int type, char* value);
+
+void token_free(token_T* token);
 #endif

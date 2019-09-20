@@ -46,11 +46,19 @@ static AST_T* list_remove_fptr(AST_T* self, dynamic_list_T* args)
     return self;
 }
 
+static char* create_str(const char* str)
+{
+    char* newstr = calloc(strlen(str) + 1, sizeof(char));
+    strcpy(newstr, str);
+
+    return newstr;
+}
+
 runtime_T* init_runtime()
 {
     runtime_T* runtime = calloc(1, sizeof(struct RUNTIME_STRUCT));
-    runtime->scope = init_hermes_scope();
-    runtime->references = init_dynamic_list(sizeof(struct RUNTIME_REFERENCE_STRUCT));
+    runtime->scope = init_hermes_scope(1);
+    runtime->references = init_dynamic_list(sizeof(struct RUNTIME_REFERENCE_STRUCT*));
     runtime->list_methods = init_dynamic_list(sizeof(struct AST_STRUCT*));
 
     INITIALIZED_NOOP = init_ast(AST_NOOP);
@@ -58,54 +66,54 @@ runtime_T* init_runtime()
     // GLOBAL FUNCTIONS
     
     AST_T* INCLUDE_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    INCLUDE_FUNCTION_DEFINITION->function_name = "include";
+    INCLUDE_FUNCTION_DEFINITION->function_name = create_str("include");
     INCLUDE_FUNCTION_DEFINITION->fptr = hermes_builtin_function_include;
     dynamic_list_append(runtime->scope->function_definitions, INCLUDE_FUNCTION_DEFINITION);
 
     AST_T* WAD_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    WAD_FUNCTION_DEFINITION->function_name = "wad";
+    WAD_FUNCTION_DEFINITION->function_name = create_str("wad");
     WAD_FUNCTION_DEFINITION->fptr = hermes_builtin_function_wad;
     dynamic_list_append(runtime->scope->function_definitions, WAD_FUNCTION_DEFINITION);
 
     AST_T* LAD_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    LAD_FUNCTION_DEFINITION->function_name = "lad";
+    LAD_FUNCTION_DEFINITION->function_name = create_str("lad");
     LAD_FUNCTION_DEFINITION->fptr = hermes_builtin_function_lad;
     dynamic_list_append(runtime->scope->function_definitions, LAD_FUNCTION_DEFINITION);
 
     AST_T* PRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    PRINT_FUNCTION_DEFINITION->function_name = "print";
+    PRINT_FUNCTION_DEFINITION->function_name = create_str("print");
     PRINT_FUNCTION_DEFINITION->fptr = hermes_builtin_function_print;
     dynamic_list_append(runtime->scope->function_definitions, PRINT_FUNCTION_DEFINITION);
 
     AST_T* PPRINT_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    PPRINT_FUNCTION_DEFINITION->function_name = "pprint";
+    PPRINT_FUNCTION_DEFINITION->function_name = create_str("pprint");
     PPRINT_FUNCTION_DEFINITION->fptr = hermes_builtin_function_pprint;
     dynamic_list_append(runtime->scope->function_definitions, PPRINT_FUNCTION_DEFINITION);
 
     AST_T* FOPEN_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    FOPEN_FUNCTION_DEFINITION->function_name = "fopen";
+    FOPEN_FUNCTION_DEFINITION->function_name = create_str("fopen");
     FOPEN_FUNCTION_DEFINITION->fptr = hermes_builtin_function_fopen;
     dynamic_list_append(runtime->scope->function_definitions, FOPEN_FUNCTION_DEFINITION);
 
     AST_T* FCLOSE_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    FCLOSE_FUNCTION_DEFINITION->function_name = "fclose";
+    FCLOSE_FUNCTION_DEFINITION->function_name = create_str("fclose");
     FCLOSE_FUNCTION_DEFINITION->fptr = hermes_builtin_function_fclose;
     dynamic_list_append(runtime->scope->function_definitions, FCLOSE_FUNCTION_DEFINITION);
 
     AST_T* FPUTS_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    FPUTS_FUNCTION_DEFINITION->function_name = "fputs";
+    FPUTS_FUNCTION_DEFINITION->function_name = create_str("fputs");
     FPUTS_FUNCTION_DEFINITION->fptr = hermes_builtin_function_fputs;
     dynamic_list_append(runtime->scope->function_definitions, FPUTS_FUNCTION_DEFINITION);
 
     // LIST FUNCTIONS
 
     AST_T* LIST_ADD_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    LIST_ADD_FUNCTION_DEFINITION->function_name = "add";
+    LIST_ADD_FUNCTION_DEFINITION->function_name = create_str("add");
     LIST_ADD_FUNCTION_DEFINITION->fptr = list_add_fptr;
     dynamic_list_append(runtime->list_methods, LIST_ADD_FUNCTION_DEFINITION);
 
     AST_T* LIST_REMOVE_FUNCTION_DEFINITION = init_ast(AST_FUNCTION_DEFINITION);
-    LIST_REMOVE_FUNCTION_DEFINITION->function_name = "remove";
+    LIST_REMOVE_FUNCTION_DEFINITION->function_name = create_str("remove");
     LIST_REMOVE_FUNCTION_DEFINITION->fptr = list_remove_fptr;
     dynamic_list_append(runtime->list_methods, LIST_REMOVE_FUNCTION_DEFINITION);
 
@@ -547,7 +555,17 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
                     dynamic_list_append(visited_fptr_args, visited);
                 }
 
-                return runtime_visit(runtime, (AST_T*) function_definition->fptr((AST_T*) function_definition, visited_fptr_args));
+                AST_T* ret = runtime_visit(runtime, (AST_T*) function_definition->fptr((AST_T*) function_definition, visited_fptr_args));
+
+                //for (int i = 0; i < visited_fptr_args->size; i++)
+                //{
+                //    ast_free((AST_T*)visited_fptr_args->items[i]);
+                //}
+
+                free(visited_fptr_args->items);
+                free(visited_fptr_args);
+
+                return ret;
             }
 
             if (function_definition->function_definition_body != (void*)0)
@@ -555,12 +573,16 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
                 hermes_scope_T* function_definition_body_scope = (hermes_scope_T*) function_definition->function_definition_body->scope; 
 
                 // Clear all existing arguments to prepare for the new definitions
-                for (int i = function_definition_body_scope->variable_definitions->size; i > 0; i--)
+                for (int i = function_definition_body_scope->variable_definitions->size-1; i > 0; i--)
+                {
                     dynamic_list_remove(
                         function_definition_body_scope->variable_definitions,
                         function_definition_body_scope->variable_definitions->items[i],
-                        (void*)0
+                        _ast_free
                     );
+
+                    function_definition_body_scope->variable_definitions->size = 0;
+                }
 
                 for (int x = 0; x < node->function_call_arguments->size; x++)
                 {
@@ -632,11 +654,8 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
                         case AST_STRING: final_result->string_value = realloc(final_result->string_value, (strlen(result->string_value) + strlen(final_result->string_value) + 1) * sizeof(char)); strcat(final_result->string_value, result->string_value); break;
                     }
 
-                    free(result);
+                    ast_free(result);
                 }
-
-                free(call_arguments->items);
-                free(call_arguments);
 
                 return final_result;
             }
@@ -667,6 +686,30 @@ AST_T* runtime_visit_function_call(runtime_T* runtime, AST_T* node)
         runtime_visit(runtime, fdef);
 
         return fdef;
+    }
+
+    if (strcmp(node->function_call_name, "free") == 0)
+    {
+        for (int i = 0; i < node->function_call_arguments->size; i++)
+        {
+            AST_T* arg = (AST_T*) node->function_call_arguments->items[i];
+
+            if (arg->type != AST_VARIABLE)
+                continue;
+
+            for (int i = 0; i < scope->variable_definitions->size; i++)
+            {
+                AST_T* vardef = scope->variable_definitions->items[i];
+
+                if (strcmp(vardef->variable_name, arg->variable_name) == 0)
+                {
+                    dynamic_list_remove(scope->variable_definitions, vardef, (void*)0);
+                    break;
+                }
+            }
+        }
+
+        return INITIALIZED_NOOP;
     }
 
     if (strcmp(node->function_call_name, "visit") == 0)
@@ -852,7 +895,8 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
                             dynamic_list_append(visited_fptr_args, visited);
                         }
 
-                        return runtime_visit(runtime, (AST_T*) _fdef->fptr((AST_T*) left, visited_fptr_args));
+                        AST_T* ret = runtime_visit(runtime, (AST_T*) _fdef->fptr((AST_T*) left, visited_fptr_args));
+                        return ret;
                     }
 
                 }

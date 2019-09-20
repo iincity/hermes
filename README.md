@@ -139,6 +139,7 @@ wad(s, "functions");
 * fopen
 * fputs
 * fclose
+* free
 
 ### print
 > Prints what ever you gives it, example:
@@ -205,6 +206,13 @@ fclose(file);
 ```C
 object file = fopen("myfile.txt", "w+");
 fclose(file);
+```
+
+### free
+> Deallocates a variable, example:
+```
+string x = "hello";
+free(x);
 ```
 
 ## Available statements

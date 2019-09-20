@@ -57,6 +57,9 @@ void dynamic_list_remove(dynamic_list_T* dynamic_list, void* element, void (*fre
 {
     int index = 0;
 
+    if (element == (void*)0)
+        return;
+
     for (int i = 0; i < dynamic_list->size; i++)
     {
         if (dynamic_list->items[i] == element)

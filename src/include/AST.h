@@ -80,6 +80,9 @@ typedef struct AST_STRUCT
 
 AST_T* init_ast(int type);
 
+void _ast_free(void* ast);
+void ast_free(AST_T* ast);
+
 AST_T* ast_copy(AST_T* ast);
 AST_T* ast_copy_object(AST_T* ast);
 AST_T* ast_copy_variable(AST_T* ast);
