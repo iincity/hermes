@@ -81,5 +81,4 @@ AST_T* hermes_parser_parse_function_call(hermes_parser_T* hermes_parser, hermes_
 
 AST_T* hermes_parser_parse_function_definition(hermes_parser_T* hermes_parser, hermes_scope_T* scope);
 
-AST_T* INITIALIZED_NOOP;
 #endif

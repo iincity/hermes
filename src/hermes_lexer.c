@@ -151,11 +151,15 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
 
                 hermes_lexer_advance(hermes_lexer);
                 
-                return init_token(TOKEN_EQUALS_EQUALS, value);
+                token_T* token = init_token(TOKEN_EQUALS_EQUALS, value);
+                free(value);
+                return token;
             }
             else
             {
-                return init_token(TOKEN_EQUALS, value);
+                token_T* token = init_token(TOKEN_EQUALS, value);
+                free(value);
+                return token;
             }
         }
 
@@ -174,10 +178,14 @@ token_T* hermes_lexer_get_next_token(hermes_lexer_T* hermes_lexer)
 
                 hermes_lexer_advance(hermes_lexer);
                 
-                return init_token(TOKEN_NOT_EQUALS, value);
+                token_T* token = init_token(TOKEN_NOT_EQUALS, value);
+                free(value);
+                return token;
             }
 
-            return init_token(TOKEN_NOT, value);
+            token_T* token = init_token(TOKEN_NOT, value);
+            free(value);
+            return token;
         }
 
         if (hermes_lexer->current_char == '/')
@@ -240,7 +248,9 @@ token_T* hermes_lexer_advance_with_token(hermes_lexer_T* hermes_lexer, int type)
 {
     char* value = hermes_lexer_current_charstr(hermes_lexer);
     hermes_lexer_advance(hermes_lexer);
-    return init_token(type, value);
+    token_T* token = init_token(type, value);
+    free(value);
+    return token;
 }
 
 /**
@@ -351,7 +361,10 @@ token_T* hermes_lexer_collect_string(hermes_lexer_T* hermes_lexer)
 
     hermes_lexer_advance(hermes_lexer);
 
-    return init_token(TOKEN_STRING_VALUE, buffer);
+    token_T* token = init_token(TOKEN_STRING_VALUE, buffer);
+    free(buffer);
+
+    return token;
 }
 
 /**
@@ -464,7 +477,10 @@ token_T* hermes_lexer_collect_id(hermes_lexer_T* hermes_lexer)
         hermes_lexer_advance(hermes_lexer);
     }
 
-    return init_token(TOKEN_ID, buffer);
+    token_T* token = init_token(TOKEN_ID, buffer);
+    free(buffer);
+
+    return token;
 }
 
 /**
