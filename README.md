@@ -217,6 +217,7 @@ free(x);
 
 ## Available statements
 * new
+* iterate
 
 ### new example
 ```C
@@ -235,6 +236,25 @@ object person = new get_person("Hanna");
 ```
 > The `new` statement will always return a new address of whatever is to the
 > right of the statement.
+
+### iterate example
+```C
+void char_iterator(char c)
+{
+    print(c);
+}
+
+void list_iterator(string name)
+{
+    print(name);
+}
+
+string x = "john doe";
+list y = ["john", "sarah", "hannah"];
+
+iterate x with char_iterator;
+iterate y with list_iterator;
+```
 
 ## Compositions
 > Hermes now also support compositions, like this:

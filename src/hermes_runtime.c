@@ -181,6 +181,7 @@ AST_T* runtime_visit(runtime_T* runtime, AST_T* node)
         case AST_IF: return runtime_visit_if(runtime, node); break;
         case AST_WHILE: return runtime_visit_while(runtime, node); break;
         case AST_NEW: return runtime_visit_new(runtime, node); break;
+        case AST_ITERATE: return runtime_visit_iterate(runtime, node); break;
         default: printf("Uncaught statement %d\n", node->type); exit(1); break;
     }
 }
@@ -1441,6 +1442,68 @@ AST_T* runtime_visit_while(runtime_T* runtime, AST_T* node)
 AST_T* runtime_visit_new(runtime_T* runtime, AST_T* node)
 {
     return ast_copy(runtime_visit(runtime, node->new_value));
+}
+
+AST_T* runtime_visit_iterate(runtime_T* runtime, AST_T* node)
+{
+    hermes_scope_T* scope = get_scope(runtime, node);
+    AST_T* ast_iterable = runtime_visit(runtime, node->iterate_iterable);
+    AST_T* ast_funcdef = (void*) 0;
+
+    for (int i = 0; i < scope->function_definitions->size; i++)
+    {
+        AST_T* fdef = scope->function_definitions->items[i];
+
+        if (strcmp(fdef->function_name, node->iterate_function->variable_name) == 0)
+        {
+            hermes_scope_T* fdef_body_scope = (hermes_scope_T*) fdef->function_definition_body->scope;
+            char* iterable_varname = ((AST_T*)fdef->function_definition_arguments->items[0])->variable_name;
+            int x = 0;
+
+            // Clear all existing arguments to prepare for the new definitions
+            for (int z = fdef_body_scope->variable_definitions->size-1; z > 0; z--)
+            {
+                dynamic_list_remove(
+                    fdef_body_scope->variable_definitions,
+                    fdef_body_scope->variable_definitions->items[z],
+                    _ast_free
+                );
+            }
+
+            if (ast_iterable->type == AST_STRING)
+            {
+                AST_T* new_variable_def = init_ast(AST_VARIABLE_DEFINITION);
+                new_variable_def->variable_value = init_ast(AST_CHAR);
+                new_variable_def->variable_value->char_value = ast_iterable->string_value[x];
+                new_variable_def->variable_name = iterable_varname;
+                
+                dynamic_list_append(fdef_body_scope->variable_definitions, new_variable_def);
+
+                for (;x < strlen(ast_iterable->string_value); x++)
+                {
+                    new_variable_def->variable_value->char_value = ast_iterable->string_value[x];
+                    runtime_visit(runtime, fdef->function_definition_body);
+                }
+            }
+            else
+            if (ast_iterable->type == AST_LIST)
+            {
+                AST_T* new_variable_def = init_ast(AST_VARIABLE_DEFINITION);
+                new_variable_def->variable_value = runtime_visit(runtime, (AST_T*)ast_iterable->list_children->items[x]);
+                new_variable_def->variable_name = iterable_varname;
+                
+                dynamic_list_append(fdef_body_scope->variable_definitions, new_variable_def);
+
+                for (;x < ast_iterable->list_children->size; x++)
+                {
+                    new_variable_def->variable_value = runtime_visit(runtime, (AST_T*)ast_iterable->list_children->items[x]);
+                    runtime_visit(runtime, fdef->function_definition_body);
+                }
+            }
+        }
+    }
+
+    return INITIALIZED_NOOP;
 }
 
 hermes_scope_T* get_scope(runtime_T* runtime, AST_T* node)

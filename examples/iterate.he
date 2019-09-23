@@ -1,9 +1,16 @@
-int p = 0;
+void char_iterator(char c)
+{
+    print(c);
+}
+
+void list_iterator(string name)
+{
+    print(name);
+}
 
 string x = "john doe";
+list y = ["john", "sarah", "hannah"];
 
-while (p < x.length)
-{
-    print(x[p]);
-    p += 1;
-}
+iterate x with char_iterator;
+
+iterate y with list_iterator;

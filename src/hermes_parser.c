@@ -18,6 +18,7 @@ const char* STATEMENT_IF = "if";
 const char* STATEMENT_ELSE = "else";
 const char* STATEMENT_RETURN = "return";
 const char* STATEMENT_NEW = "new";
+const char* STATEMENT_ITERATE = "iterate";
 
 const char* VALUE_FALSE = "false";
 const char* VALUE_TRUE = "true";
@@ -94,6 +95,9 @@ AST_T* hermes_parser_parse_statement(hermes_parser_T* hermes_parser, hermes_scop
 
             if (strcmp(token_value, STATEMENT_NEW) == 0)
                 return hermes_parser_parse_new(hermes_parser, scope);
+
+            if (strcmp(token_value, STATEMENT_ITERATE) == 0)
+                return hermes_parser_parse_iterate(hermes_parser, scope);
 
             if (
                 strcmp(token_value, DATA_TYPE_VOID) == 0 ||
@@ -564,6 +568,23 @@ AST_T* hermes_parser_parse_new(hermes_parser_T* hermes_parser, hermes_scope_T* s
     ast_new->new_value = hermes_parser_parse_expr(hermes_parser, scope);
 
     return ast_new;
+}
+
+
+AST_T* hermes_parser_parse_iterate(hermes_parser_T* hermes_parser, hermes_scope_T* scope)
+{
+    hermes_parser_eat(hermes_parser, TOKEN_ID); // iterate
+    hermes_parser_eat(hermes_parser, TOKEN_ID);
+    AST_T* ast_var = hermes_parser_parse_variable(hermes_parser, scope); // variable
+    hermes_parser_eat(hermes_parser, TOKEN_ID); // with
+    hermes_parser_eat(hermes_parser, TOKEN_ID);
+    AST_T* ast_fname = hermes_parser_parse_variable(hermes_parser, scope); // function name
+
+    AST_T* ast_iterate = init_ast(AST_ITERATE);
+    ast_iterate->iterate_iterable = ast_var;
+    ast_iterate->iterate_function = ast_fname;
+
+    return ast_iterate;
 }
 
 // loops

@@ -46,6 +46,8 @@ AST_T* init_ast(int type)
     AST->new_value = (void*) 0;
     AST->scope = (void*) 0;
     AST->fptr = (void*) 0;
+    AST->iterate_iterable = (void*) 0;
+    AST->iterate_function = (void*) 0;
 
     return AST;
 }
