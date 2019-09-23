@@ -1,0 +1,9 @@
+int p = 0;
+
+string x = "john doe";
+
+while (p < x.length)
+{
+    print(x[p]);
+    p += 1;
+}

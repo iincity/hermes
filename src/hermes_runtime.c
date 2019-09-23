@@ -849,14 +849,23 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
         }
     }
     else
-    if (left->type == AST_LIST)
+    if (left->type == AST_LIST || left->type == AST_STRING)
     {
         if (node->binop_right->type == AST_VARIABLE)
         {
             if (strcmp(node->binop_right->variable_name, "length") == 0)
             {
                 AST_T* int_ast = init_ast(AST_INTEGER);
-                int_ast->int_value = left->list_children->size;
+
+                if (left->type == AST_LIST)
+                {
+                    int_ast->int_value = left->list_children->size;
+                }
+                else
+                if (left->type == AST_STRING)
+                {
+                    int_ast->int_value = strlen(left->string_value);
+                }
 
                 return int_ast;
             }
@@ -915,12 +924,20 @@ AST_T* runtime_visit_list_access(runtime_T* runtime, AST_T* node)
 {
     AST_T* left = runtime_visit(runtime, node->binop_left);
 
-    if (left->type != AST_LIST)
+    if (left->type == AST_LIST)
     {
-        printf("Not a list\n"); exit(1);
+        return left->list_children->items[runtime_visit(runtime, node->list_access_pointer)->int_value];
+    }
+    else
+    if (left->type == AST_STRING)
+    {
+        AST_T* ast = init_ast(AST_CHAR);
+        ast->char_value = left->string_value[runtime_visit(runtime, node->list_access_pointer)->int_value];
+        return ast;
     }
 
-    return left->list_children->items[runtime_visit(runtime, node->list_access_pointer)->int_value];
+    printf("list_access left value is not iterable.\n");
+    exit(1);
 }
 
 AST_T* runtime_visit_binop(runtime_T* runtime, AST_T* node)
