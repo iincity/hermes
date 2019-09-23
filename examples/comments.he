@@ -7,3 +7,8 @@ print("hello"); // comment
 print("batman"); /* comment */
 
 print("still alive");
+
+# woah comment
+print("alive 001"); # alive
+# alive
+print("alive");
