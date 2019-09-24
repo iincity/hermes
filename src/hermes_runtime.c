@@ -597,11 +597,6 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
 
                 AST_T* ret = runtime_visit(runtime, (AST_T*) function_definition->fptr((AST_T*) function_definition, visited_fptr_args));
 
-                //for (int i = 0; i < visited_fptr_args->size; i++)
-                //{
-                //    ast_free((AST_T*)visited_fptr_args->items[i]);
-                //}
-
                 free(visited_fptr_args->items);
                 free(visited_fptr_args);
 
