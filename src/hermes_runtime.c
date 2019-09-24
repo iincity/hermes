@@ -54,6 +54,45 @@ static char* create_str(const char* str)
     return newstr;
 }
 
+static AST_T* _runtime_function_call(runtime_T* runtime, AST_T* fcall, AST_T* fdef)
+{
+    hermes_scope_T* function_definition_body_scope = (hermes_scope_T*) fdef->function_definition_body->scope; 
+
+    // Clear all existing arguments to prepare for the new definitions
+    for (int i = function_definition_body_scope->variable_definitions->size-1; i > 0; i--)
+    {
+        dynamic_list_remove(
+            function_definition_body_scope->variable_definitions,
+            function_definition_body_scope->variable_definitions->items[i],
+            _ast_free
+        );
+
+        function_definition_body_scope->variable_definitions->size = 0;
+    }
+
+    for (int x = 0; x < fcall->function_call_arguments->size; x++)
+    {
+        AST_T* ast_arg = (AST_T*) fcall->function_call_arguments->items[x];
+
+        if (x > fdef->function_definition_arguments->size - 1)
+        {
+            printf("Too many arguments\n");
+            break;
+        }
+
+        AST_T* ast_fdef_arg = (AST_T*) fdef->function_definition_arguments->items[x];
+        char* arg_name = ast_fdef_arg->variable_name;
+
+        AST_T* new_variable_def = init_ast(AST_VARIABLE_DEFINITION);
+        new_variable_def->variable_value = runtime_visit(runtime, ast_arg);
+        new_variable_def->variable_name = arg_name;
+
+        dynamic_list_append(function_definition_body_scope->variable_definitions, new_variable_def);
+    }
+
+    return runtime_visit(runtime, fdef->function_definition_body);
+}
+
 runtime_T* init_runtime()
 {
     runtime_T* runtime = calloc(1, sizeof(struct RUNTIME_STRUCT));
@@ -571,41 +610,7 @@ AST_T* runtime_function_lookup(runtime_T* runtime, hermes_scope_T* scope, AST_T*
 
             if (function_definition->function_definition_body != (void*)0)
             {
-                hermes_scope_T* function_definition_body_scope = (hermes_scope_T*) function_definition->function_definition_body->scope; 
-
-                // Clear all existing arguments to prepare for the new definitions
-                for (int i = function_definition_body_scope->variable_definitions->size-1; i > 0; i--)
-                {
-                    dynamic_list_remove(
-                        function_definition_body_scope->variable_definitions,
-                        function_definition_body_scope->variable_definitions->items[i],
-                        _ast_free
-                    );
-
-                    function_definition_body_scope->variable_definitions->size = 0;
-                }
-
-                for (int x = 0; x < node->function_call_arguments->size; x++)
-                {
-                    AST_T* ast_arg = (AST_T*) node->function_call_arguments->items[x];
-
-                    if (x > function_definition->function_definition_arguments->size - 1)
-                    {
-                        printf("Too many arguments\n");
-                        break;
-                    }
-
-                    AST_T* ast_fdef_arg = (AST_T*) function_definition->function_definition_arguments->items[x];
-                    char* arg_name = ast_fdef_arg->variable_name;
-
-                    AST_T* new_variable_def = init_ast(AST_VARIABLE_DEFINITION);
-                    new_variable_def->variable_value = runtime_visit(runtime, ast_arg);
-                    new_variable_def->variable_name = arg_name;
-
-                    dynamic_list_append(function_definition_body_scope->variable_definitions, new_variable_def);
-                }
-
-                return runtime_visit(runtime, function_definition->function_definition_body);
+                return _runtime_function_call(runtime, node, function_definition);
             }
             else
             if (function_definition->composition_children != (void*)0)
@@ -878,8 +883,10 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
         if (node->binop_right->type == AST_VARIABLE || node->binop_right->type == AST_VARIABLE_ASSIGNMENT || node->binop_right->type == AST_VARIABLE_MODIFIER || node->binop_right->type == AST_ATTRIBUTE_ACCESS)
         {
             node->binop_right->object_children = left->object_children;
+            node->binop_right->scope = left->scope;
             node->binop_right->is_object_child = 1;
             node->object_children = left->object_children;
+            node->scope = left->scope;
         }
     }
 
@@ -910,6 +917,19 @@ AST_T* runtime_visit_attribute_access(runtime_T* runtime, AST_T* node)
                     }
 
                 }
+            }
+        }
+        
+        if (left->object_children != (void*)0)
+        {
+            for (int i = 0; i < left->object_children->size; i++)
+            {
+                AST_T* obj_child = (AST_T*) left->object_children->items[i];
+
+                if (obj_child->type != AST_FUNCTION_DEFINITION)
+                    continue;
+
+                return _runtime_function_call(runtime, node->binop_right, obj_child); 
             }
         }
     }
