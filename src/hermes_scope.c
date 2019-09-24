@@ -13,7 +13,6 @@ hermes_scope_T* init_hermes_scope(unsigned int global)
 
 void hermes_scope_free(hermes_scope_T* hermes_scope)
 {
-
     if (hermes_scope->variable_definitions)
     {
         for (int i = 0; i < hermes_scope->variable_definitions->size; i++)
@@ -47,22 +46,43 @@ void hermes_scope_free(hermes_scope_T* hermes_scope)
                 ast_free(fdef->function_definition_type);
 
             if (fdef->function_name)
-                free(fdef->function_name);
-
-            if (fdef->function_definition_body)
-                ast_free(fdef->function_definition_body);
+                free(fdef->function_name); 
 
             if (fdef->function_definition_arguments)
             {
                 for (int x = 0; x < fdef->function_definition_arguments->size; x++)
                 {
-                    if ((AST_T*)fdef->function_definition_arguments->items[x] != fdef)
-                        ast_free((AST_T*)fdef->function_definition_arguments->items[x]);
+                    AST_T* vardef = (AST_T*) fdef->function_definition_arguments->items[x];
+
+                    if (vardef == fdef)
+                        continue;
+
+                    if (vardef->variable_name)
+                        free(vardef->variable_name);
+
+                    if (vardef->variable_type)
+                        ast_free(vardef->variable_type);
+
+                    if (vardef->variable_value)
+                        ast_free(vardef->variable_value);
+
+                    free(vardef);
                 }
 
                 free(fdef->function_definition_arguments->items);
                 free(fdef->function_definition_arguments);
-                fdef->function_definition_arguments = (void*) 0;
+                fdef->function_definition_arguments = (void*) 0; 
+            }
+
+            if (fdef->function_definition_body)
+            {
+                /*if (fdef->function_definition_body->scope)
+                {
+                    if ((hermes_scope_T*)fdef->function_definition_body->scope != hermes_scope)
+                        hermes_scope_free((hermes_scope_T*)fdef->function_definition_body->scope);
+                }*/
+
+                ast_free(fdef->function_definition_body);
             }
 
             if (fdef->composition_children)
@@ -79,7 +99,7 @@ void hermes_scope_free(hermes_scope_T* hermes_scope)
             }
 
             free(fdef);
-        }
+        } 
 
         free(hermes_scope->function_definitions->items);
         free(hermes_scope->function_definitions);
