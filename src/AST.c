@@ -71,10 +71,7 @@ void ast_free(AST_T* ast)
         free(ast->function_call_name);
 
     if (ast->string_value)
-        free(ast->string_value);
-
-    if (ast->type_value)
-        free(ast->type_value);
+        free(ast->string_value); 
 
     if (ast->variable_name)
         free(ast->variable_name);
@@ -84,6 +81,9 @@ void ast_free(AST_T* ast)
 
     if (ast->variable_type)
         ast_free(ast->variable_type);
+
+    //if (ast->type_value)
+    //    free(ast->type_value);
 
     if (ast->variable_assignment_left)
         ast_free(ast->variable_assignment_left);
