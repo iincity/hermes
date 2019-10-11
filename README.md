@@ -40,6 +40,7 @@ print(response)
 * int
 * bool
 * float
+* char
 * string
 * object
 * ref
@@ -86,6 +87,11 @@ bool x = 10 > 3;
 > Everyone knows what an float is.
 ```C
 float x = 0.5;
+```
+
+### Char example
+```C
+char c = 'a';
 ```
 
 ### String example
