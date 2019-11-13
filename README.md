@@ -1,3 +1,7 @@
+<div style='text-align: center;' align='center'>
+    <img style='max-width: 300px;' src='hermes_logo.png'/>
+</div>
+
 # Hermes
 > A C-like scripting language.
 
