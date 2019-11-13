@@ -137,7 +137,7 @@ wad(s, "functions");
 
 ## Built-in methods
 * print
-* pprint
+* aprint
 * include
 * wad
 * lad
@@ -153,12 +153,12 @@ wad(s, "functions");
 print("hello world");
 ```
 
-### pprint
+### aprint
 > Prints the adress of a value, example:
 ```C
 object person = {string name = "John Doe";};
 
-pprint(person);
+aprint(person);
 ```
 
 ### include

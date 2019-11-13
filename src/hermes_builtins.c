@@ -44,7 +44,7 @@ AST_T* hermes_builtin_function_print(AST_T* self, dynamic_list_T* args)
  *
  * @return AST_T*
  */
-AST_T* hermes_builtin_function_pprint(AST_T* self, dynamic_list_T* args)
+AST_T* hermes_builtin_function_aprint(AST_T* self, dynamic_list_T* args)
 {
     for (int i = 0; i < args->size; i++)
         printf("%p\n", (AST_T*) args->items[i]);

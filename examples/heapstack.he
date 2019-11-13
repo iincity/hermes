@@ -10,9 +10,9 @@ object get_person(string name)
 }
 
 object apa = new get_person("hanna");
-pprint(apa);
+aprint(apa);
 object apa2 = new get_person("bobby");
-pprint(apa2);
+aprint(apa2);
 
 print(apa.name);
 print(apa2.name);
