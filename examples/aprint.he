@@ -2,5 +2,4 @@ object o = new {
     string x = "hey";
 };
 
-pprint(o);
-
+aprint(o);

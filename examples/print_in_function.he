@@ -1,7 +1,7 @@
 void say_hello(string message)
 {
     print(message);
-    pprint(message);
+    aprint(message);
 }
 
 say_hello("David");
